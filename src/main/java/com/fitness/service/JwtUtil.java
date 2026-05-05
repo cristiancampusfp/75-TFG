@@ -1,4 +1,3 @@
-// JwtUtil.java
 package com.fitness.service;
 
 import io.jsonwebtoken.*;
@@ -19,10 +18,12 @@ public class JwtUtil {
     @Value("${app.jwt.expiration}")
     private long jwtExpirationMs;
 
-    public String generateToken(String email) {
+    // ACTUALIZADO: Ahora recibe el rol y lo guarda en los 'claims' del token
+    public String generateToken(String email, String rol) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
         return Jwts.builder()
                 .setSubject(email)
+                .claim("rol", rol) // Aquí incrustamos el rol en el JWT
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS512)
@@ -37,6 +38,17 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    // NUEVO: Método para que el filtro extraiga el rol del token
+    public String getRolFromToken(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("rol", String.class);
     }
 
     public boolean validateToken(String token) {

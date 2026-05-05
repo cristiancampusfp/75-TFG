@@ -19,7 +19,7 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil; // Añadimos el generador de tokens
+    private final JwtUtil jwtUtil;
 
     public void registrarUsuario(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
@@ -48,21 +48,18 @@ public class AuthService {
         usuarioRepository.save(nuevoUsuario);
     }
 
-    // NUEVO MÉTODO: Lógica de inicio de sesión
     public AuthResponse login(LoginRequest request) {
-        // 1. Buscamos al usuario por su email
+
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 2. Comprobamos si la contraseña coincide (la plana contra la encriptada)
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        // 3. Generamos el Token JWT
-        String token = jwtUtil.generateToken(usuario.getEmail());
+        // CORREGIDO: Ahora le pasamos el email y el nombre del rol para que se guarde en el JWT
+        String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().getNombre());
 
-        // 4. Preparamos los datos limpios para devolverlos al frontend
         UsuarioDTO dto = new UsuarioDTO();
         dto.setId(usuario.getId());
         dto.setNombre(usuario.getNombre());
@@ -72,7 +69,6 @@ public class AuthService {
         dto.setNivelExperiencia(usuario.getNivelExperiencia());
         dto.setTipoSuscripcion(usuario.getTipoSuscripcion());
 
-        // Devolvemos el token junto con los datos del usuario
         return new AuthResponse(token, dto);
     }
 }

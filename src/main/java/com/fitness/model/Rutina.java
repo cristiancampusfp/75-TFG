@@ -25,6 +25,8 @@ public class Rutina {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Column(name = "tipo_rutina", length = 50)
+    private String tipoRutina;
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 

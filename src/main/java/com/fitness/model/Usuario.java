@@ -49,6 +49,9 @@ public class Usuario {
     @Column(name = "dias_disponibles")
     private Integer diasDisponibles;
 
+    @Column(length = 10)
+    private String sexo; // "MASCULINO" o "FEMENINO"
+
     @Column(name = "tipo_suscripcion", length = 20)
     private String tipoSuscripcion;
 

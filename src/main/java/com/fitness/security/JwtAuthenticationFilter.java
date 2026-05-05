@@ -1,4 +1,3 @@
-// JwtAuthenticationFilter.java
 package com.fitness.security;
 
 import com.fitness.service.JwtUtil;
@@ -33,12 +32,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && jwtUtil.validateToken(token)) {
             String email = jwtUtil.getEmailFromToken(token);
 
+            // CORRECCIÓN CRÍTICA: Extraemos el rol del token
+            String rol = jwtUtil.getRolFromToken(token);
+
             List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            // Si el token tiene un rol, se lo asignamos al usuario autenticado
+            if (rol != null && !rol.isEmpty()) {
+                authorities.add(new SimpleGrantedAuthority(rol));
+            }
+
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(email, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(auth);
-            log.debug("Token válido para usuario: {}", email);
+            log.debug("Token válido para usuario: {} con rol: {}", email, rol);
         }
 
         filterChain.doFilter(request, response);

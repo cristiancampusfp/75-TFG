@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "rutina_ejercicios", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_rutina_dia_orden", columnNames = {"rutina_id", "dia_semana", "orden"})
+        // 🔥 ACTUALIZADO: Ahora la combinación única incluye la 'semana'
+        @UniqueConstraint(name = "unique_rutina_semana_dia_orden", columnNames = {"rutina_id", "semana", "dia_semana", "orden"})
 })
 public class RutinaEjercicio {
 
@@ -27,6 +28,10 @@ public class RutinaEjercicio {
     @JoinColumn(name = "ejercicio_id", nullable = false)
     private Ejercicio ejercicio;
 
+    // --- NUEVO CAMPO SEMANA ---
+    @Column(name = "semana", nullable = false)
+    private Integer semana = 1;
+
     @Column(name = "dia_semana", nullable = false)
     private Integer diaSemana;
 
@@ -36,8 +41,9 @@ public class RutinaEjercicio {
     @Column(nullable = false)
     private Integer series;
 
-    @Column(nullable = false)
-    private Integer repeticiones;
+    // --- CAMBIADO A STRING PARA LOS RANGOS (Ej: "5-8") ---
+    @Column(nullable = false, length = 20)
+    private String repeticiones;
 
     @Column(name = "descanso_segundos", nullable = false)
     private Integer descansoSegundos;

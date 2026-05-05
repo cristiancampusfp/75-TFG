@@ -6,15 +6,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class WebController {
 
-    @GetMapping("/register")
-    public String showRegisterPage() {
-        // Esto le dice a Spring que busque el archivo "register.html" dentro de src/main/resources/templates/
-        return "register";
+    // Rutas públicas
+    @GetMapping("/login")
+    public String mostrarLogin() {
+        return "login"; // Carga src/main/resources/templates/login.html
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        // Esto busca "login.html"
-        return "login";
+    @GetMapping("/register")
+    public String mostrarRegistro() {
+        return "register"; // Carga src/main/resources/templates/register.html
+    }
+
+    // Rutas protegidas (El JWT y Spring Security se encargan de que no entre cualquiera)
+    @GetMapping("/dashboard-admin")
+    public String mostrarDashboardAdmin() {
+        return "dashboard-admin"; // Carga src/main/resources/templates/dashboard-admin.html
+    }
+
+    @GetMapping("/dashboard-cliente")
+    public String mostrarDashboardCliente() {
+        return "dashboard-cliente"; // Carga src/main/resources/templates/dashboard-cliente.html
     }
 }

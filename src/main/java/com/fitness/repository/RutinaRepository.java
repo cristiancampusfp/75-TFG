@@ -8,5 +8,10 @@ import java.util.List;
 
 @Repository
 public interface RutinaRepository extends JpaRepository<Rutina, Long> {
+
+    // La que ya tenías para buscar todas las rutinas
     List<Rutina> findByUsuarioId(Long usuarioId);
+
+    // NUEVA LÍNEA: Para buscar las rutinas filtrando por su estado (ACTIVA)
+    List<Rutina> findByUsuarioIdAndEstado(Long usuarioId, String estado);
 }
