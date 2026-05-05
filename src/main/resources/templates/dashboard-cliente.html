@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel de Entrenamiento PRO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        /* Estilos añadidos para la Dieta */
+        .card-macro { border-radius: 15px; transition: transform 0.2s; }
+        .card-macro:hover { transform: translateY(-5px); }
+        .bg-protein { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .bg-carbs { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .bg-fats { background-color: #fff3e0; color: #ef6c00; border: 1px solid #ffe0b2; }
+        #menuIAContenedor { white-space: pre-line; background: #f8f9fa; border-radius: 10px; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4 shadow">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1" id="navNombreUsuario">⚡ Fitness App PRO</span>
+        <button class="btn btn-outline-danger btn-sm" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- CABECERA -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 id="tituloBienvenida" class="fw-bold">Cargando tu perfil...</h2>
+            <p class="text-muted">Gestiona tus rutinas, registra tus pesos y calcula tu fuerza real.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <button id="btnGenerar" class="btn btn-success shadow" onclick="generarRutina()">
+                ✨ IA: Generar Rutina
+            </button>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN POR PESTAÑAS -->
+    <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="pills-rutinas-tab" data-bs-toggle="pill" data-bs-target="#pills-rutinas" type="button" role="tab">🏋️‍♂️ Mis Rutinas</button>
+        </li>
+        <!-- 🔥 NUEVA PESTAÑA DE DIETA AÑADIDA AQUÍ -->
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pills-dieta-tab" data-bs-toggle="pill" data-bs-target="#pills-dieta" type="button" role="tab" onclick="cargarDieta()">🍎 Mi Dieta</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="pills-diario-tab" data-bs-toggle="pill" data-bs-target="#pills-diario" type="button" role="tab" onclick="cargarHistorial()">📖 Mi Diario</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold text-warning bg-dark" id="pills-1rm-tab" data-bs-toggle="pill" data-bs-target="#pills-1rm" type="button" role="tab">🔬 Laboratorio 1RM</button>
+        </li>
+    </ul>
+
+    <!-- CONTENIDO DE LAS PESTAÑAS -->
+    <div class="tab-content" id="pills-tabContent">
+
+        <!-- PESTAÑA 1: RUTINAS -->
+        <div class="tab-pane fade show active" id="pills-rutinas" role="tabpanel">
+            <div id="contenedorRutinas">
+                <div class="text-center mt-5"><div class="spinner-border text-primary" role="status"></div></div>
+            </div>
+        </div>
+
+        <!-- 🔥 NUEVO CONTENIDO PESTAÑA: DIETA -->
+        <div class="tab-pane fade" id="pills-dieta" role="tabpanel">
+            <!-- VISTA A: FORMULARIO INICIAL -->
+            <div id="seccionConfigurarDieta" class="d-none">
+                <div class="card shadow border-0 p-4">
+                    <h3 class="fw-bold text-primary mb-3">Configura tu Plan Nutricional 🧬</h3>
+                    <p class="text-muted">Utilizaremos la ciencia de Eric Helms para calcular tus macros según tu objetivo.</p>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Altura (en metros, ej: 1.75)</label>
+                            <input type="number" step="0.01" id="dietaAltura" class="form-control" placeholder="1.80">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nivel de Actividad</label>
+                            <select id="dietaActividad" class="form-select">
+                                <option value="sedentario">Sedentario (Poco ejercicio)</option>
+                                <option value="ligero" selected>Ligero (2-3 días/semana)</option>
+                                <option value="moderado">Moderado (4-5 días/semana)</option>
+                                <option value="intenso">Intenso (Atleta diario)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-success">Lo que te gusta comer</label>
+                            <textarea id="dietaGusta" class="form-control" rows="2" placeholder="Pollo, arroz, huevos, avena..."></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-danger">Lo que NO te gusta</label>
+                            <textarea id="dietaOdia" class="form-control" rows="2" placeholder="Brócoli, pescado, champiñones..."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary fw-bold" onclick="configurarDieta()">Calcular Macros</button>
+                </div>
+            </div>
+
+            <!-- VISTA B: DASHBOARD DE DIETA -->
+            <div id="seccionPanelDieta" class="d-none">
+                <div class="row mb-4">
+                    <!-- Resumen Calorías -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card bg-dark text-white text-center p-4 h-100 shadow">
+                            <h6 class="text-uppercase small text-warning">Calorías Objetivo</h6>
+                            <h1 class="display-4 fw-bold" id="displayCals">0</h1>
+                            <p class="mb-0 text-muted">Mantenimiento: <span id="displayMant">0</span> kcal</p>
+                        </div>
+                    </div>
+                    <!-- Macros -->
+                    <div class="col-md-8 mb-3">
+                        <div class="row h-100">
+                            <div class="col-4"><div class="card card-macro bg-protein h-100 text-center p-3"><h6 class="fw-bold">Proteína</h6><h2 class="mb-0" id="displayPro">0g</h2></div></div>
+                            <div class="col-4"><div class="card card-macro bg-carbs h-100 text-center p-3"><h6 class="fw-bold">Carbos</h6><h2 class="mb-0" id="displayCarb">0g</h2></div></div>
+                            <div class="col-4"><div class="card card-macro bg-fats h-100 text-center p-3"><h6 class="fw-bold">Grasas</h6><h2 class="mb-0" id="displayFat">0g</h2></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Tarjeta de Control de Peso Modificada -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow border-0 p-4 h-100 flex-column d-flex">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-scale me-2"></i>Control de Peso</h5>
+                            <p class="small text-muted">Añade tu peso semanal. El sistema se auto-ajustará si te estancas en volumen.</p>
+                            <div class="input-group mb-3">
+                                <input type="number" step="0.1" id="inputPesoDieta" class="form-control" placeholder="Peso hoy (kg)">
+                                <button class="btn btn-primary fw-bold" onclick="registrarPesoDieta()">Registrar</button>
+                            </div>
+
+                            <!-- 🔥 AQUÍ APARECERÁ EL HISTORIAL VISIBLE -->
+                            <h6 class="fw-bold mt-2 text-secondary">Últimos registros:</h6>
+                            <ul id="listaPesos" class="list-group list-group-flush mb-3">
+                                <!-- Se llena por JavaScript -->
+                            </ul>
+
+                            <!-- 🔥 BOTÓN PARA FORZAR EL RECÁLCULO DESDE CERO -->
+                            <button class="btn btn-outline-danger btn-sm w-100 mt-auto fw-bold" onclick="forzarRecalculo()">
+                                ⚙️ Forzar recálculo de macros
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow border-0 p-4 h-100">
+                            <div class="d-flex justify-content-between mb-3 align-items-center">
+                                <h5 class="fw-bold mb-0">🍎 Menú del Día (IA)</h5>
+                                <button class="btn btn-sm btn-success fw-bold" id="btnGenerarDieta" onclick="generarMenuIA()">✨ Generar</button>
+                            </div>
+                            <div id="menuIAContenedor" class="text-muted">Dale a "Generar" para diseñar un menú basado en tus macros exactos...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: DIARIO -->
+        <div class="tab-pane fade" id="pills-diario" role="tabpanel">
+            <div class="card shadow border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Historial de Entrenamientos</h5>
+                </div>
+                <div class="card-body">
+
+                    <!-- Contenedor para los botones de las semanas -->
+                    <div id="filtrosSemanas" class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+                        <!-- Se llenará con JavaScript con botones "Semana 1", "Semana 2", etc. -->
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle text-center">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Día</th>
+                                <th>Ejercicio</th>
+                                <th>Kilos Movidos</th>
+                                <th>Nº Serie y Reps</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tablaHistorial">
+                            <!-- Se llena con JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 3: LABORATORIO 1RM -->
+        <div class="tab-pane fade" id="pills-1rm" role="tabpanel">
+            <div class="card shadow border-0 bg-dark text-white text-center p-5">
+                <h3 class="text-warning">Calculadora de Fuerza Máxima (1RM)</h3>
+                <p>Descubre cuál es tu límite teórico basado en tus entrenamientos reales.</p>
+
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <input type="number" id="inputEjercicio1RM" class="form-control" placeholder="Introduce el ID del ejercicio (míralo en tu rutina)">
+                            <button class="btn btn-warning fw-bold" type="button" onclick="calcular1RM()">Calcular Mi Poder</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultado1RM" class="mt-4" style="display: none;">
+                    <h1 class="display-1 fw-bold text-success" id="peso1RM">0 Kg</h1>
+                    <h4 id="nombreEj1RM">Ejercicio</h4>
+                    <p class="lead mt-3 text-light" id="mensaje1RM"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA REGISTRAR EJERCICIO PRO -->
+<div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTitulo">Registrar Ejercicio</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formRegistro">
+                    <input type="hidden" id="regRutinaId">
+                    <input type="hidden" id="regEjercicioId">
+
+                    <!-- 🔥 NUEVO: Input de número infinito en lugar de un select cerrado -->
+                    <div class="mb-3 p-3 bg-light rounded border text-center">
+                        <label class="form-label fw-bold text-primary mb-2">¿Qué semana estás registrando?</label>
+                        <div class="input-group w-50 mx-auto">
+                            <span class="input-group-text bg-primary text-white fw-bold">Semana</span>
+                            <input type="number" class="form-control form-control-lg fw-bold text-center" id="regSemana" min="1" value="1">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm text-center align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Serie</th>
+                                <th>Reps</th>
+                                <th>Peso (Kg)</th>
+                                <th>Esfuerzo (RPE)</th>
+                                <th>Descanso (s)</th>
+                            </tr>
+                            </thead>
+                            <tbody id="contenedorSeries">
+                            <!-- Se llenará con JavaScript dependiendo de las series de la rutina -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Duración total sesión (min)</label>
+                            <input type="number" class="form-control" id="regMinutos" placeholder="Ej: 60" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">Notas generales (Opcional)</label>
+                            <input type="text" class="form-control" id="regNotas" placeholder="Ej: Me dolió un poco el hombro">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary fw-bold" onclick="guardarRegistroMultiple()">💾 Guardar Series</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR UN REGISTRO -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold">✏️ Editar Registro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRegistroId">
+                <div class="mb-3">
+                    <label class="form-label">Peso Real (Kg)</label>
+                    <input type="number" step="0.5" class="form-control text-success fw-bold text-center" id="editPeso">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Repeticiones Hechas</label>
+                    <input type="number" class="form-control text-center" id="editReps">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning fw-bold btn-sm" onclick="ejecutarEdicion()">💾 Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de Bootstrap y Lógica -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const token = localStorage.getItem('jwtToken');
+    if(!token) window.location.href = '/login';
+
+    const usuarioDatosStr = localStorage.getItem('usuarioDatos');
+    if(usuarioDatosStr) {
+        const usuarioDatos = JSON.parse(usuarioDatosStr);
+        document.getElementById('tituloBienvenida').innerText = '¡Hola, ' + usuarioDatos.nombre + '! 💪';
+    }
+
+    // --- VARIABLES GLOBALES PARA EL DIARIO ---
+    let historialCompleto = [];
+    let semanaActiva = null;
+
+    // --- 1. CARGAR RUTINAS ---
+    function cargarRutinas() {
+        fetch('/api/rutinas', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                const contenedor = document.getElementById('contenedorRutinas');
+                contenedor.innerHTML = '';
+                if(data.length === 0) {
+                    contenedor.innerHTML = `<div class="alert alert-info text-center shadow-sm"><h4>Aún no tienes rutinas</h4></div>`;
+                    return;
+                }
+
+                data.forEach(rutina => {
+                    let html = `
+<div class="card mb-5 shadow border-0">
+<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+<h4 class="mb-0">${rutina.nombre}</h4>
+<span class="badge bg-light text-primary fs-6">${rutina.tipoRutina || 'Generada'} | Días: ${rutina.diasSemana}</span>
+</div>
+<div class="card-body bg-white">
+<p class="card-text">${rutina.descripcion}</p>
+<div class="table-responsive">
+<table class="table table-hover table-bordered text-center align-middle mt-3">
+<thead class="table-light">
+<tr>
+<th>ID</th>
+<th>Día</th>
+<th>Ejercicio</th>
+<th>Series x Meta</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>`;
+
+                    rutina.ejercicios.forEach(ej => {
+                        html += `
+<tr>
+<td class="text-muted small">ID: ${ej.id}</td>
+<td class="fw-bold text-primary">${ej.nombreDia.replace(/Semana \d+ /gi, '').trim()}</td>
+<td class="fw-bold">${ej.nombreEjercicio}</td>
+<td>${ej.series} x ${ej.repeticiones}</td>
+<td>
+<button class="btn btn-sm btn-outline-primary"
+onclick="abrirModalRegistro(${rutina.id}, ${ej.id}, '${ej.nombreEjercicio}', ${ej.series}, '${ej.repeticiones}', ${ej.descansoSegundos}, ${ej.semana})">
+📝 Registrar
+</button>
+</td>
+</tr>`;
+                    });
+
+                    html += `</tbody></table></div></div></div>`;
+                    contenedor.innerHTML += html;
+                });
+            });
+    }
+
+    // --- 2. REGISTRAR ENTRENAMIENTO (MODAL MULTI-SERIE) ---
+    const modalRegistro = new bootstrap.Modal(document.getElementById('modalRegistro'));
+
+    function abrirModalRegistro(rutinaId, ejercicioId, nombreEj, seriesObjetivo, repsObjetivo, descansoObjetivo, semanaRecomendada) {
+        document.getElementById('modalTitulo').innerText = 'Registrar: ' + nombreEj;
+        document.getElementById('regRutinaId').value = rutinaId;
+        document.getElementById('regEjercicioId').value = ejercicioId;
+
+        // Pone el número de la semana en la cajita
+        if (semanaRecomendada) {
+            document.getElementById('regSemana').value = semanaRecomendada;
+        }
+
+        const tbody = document.getElementById('contenedorSeries');
+        tbody.innerHTML = '';
+
+        for(let i = 1; i <= (seriesObjetivo || 3); i++) {
+            tbody.innerHTML += `
+<tr class="fila-serie">
+<td class="fw-bold pt-3 text-primary">${i}</td>
+<td><input type="number" class="form-control input-reps text-center" placeholder="Meta: ${repsObjetivo}"></td>
+<td><input type="number" step="0.5" class="form-control text-success fw-bold input-peso text-center" placeholder="Kg"></td>
+<td>
+<select class="form-select input-rpe text-center">
+<option value="10">10 (Al fallo)</option>
+<option value="9" selected>9 (1 en reserva)</option>
+<option value="8">8 (2 en reserva)</option>
+<option value="7">7 (Fácil)</option>
+</select>
+</td>
+<td><input type="number" class="form-control input-descanso text-center" value="${descansoObjetivo || 90}"></td>
+</tr>
+`;
+        }
+
+        modalRegistro.show();
+    }
+
+    function guardarRegistroMultiple() {
+        const rutinaId = document.getElementById('regRutinaId').value;
+        const ejercicioId = document.getElementById('regEjercicioId').value;
+        const minutos = document.getElementById('regMinutos').value || 60;
+        const notasGlobales = document.getElementById('regNotas').value;
+
+        // Coge el número que haya escrito el usuario (sea 1, 10 o 52)
+        const semanaElegida = parseInt(document.getElementById('regSemana').value) || 1;
+
+        const filas = document.querySelectorAll('.fila-serie');
+        const arrayDeSeries = [];
+        let desgloseNotas = "RPE/Descansos: ";
+
+        filas.forEach((fila, index) => {
+            const reps = parseInt(fila.querySelector('.input-reps').value) || 0;
+            const peso = parseFloat(fila.querySelector('.input-peso').value) || 0;
+            const rpe = fila.querySelector('.input-rpe').value;
+            const descanso = fila.querySelector('.input-descanso').value;
+
+            if(peso > 0 || reps > 0) {
+                desgloseNotas += `[S${index+1}: RPE:${rpe} D:${descanso}s] `;
+
+                arrayDeSeries.push({
+                    ejercicioId: ejercicioId,
+                    seriesCompletadas: index + 1,
+                    repeticionesRealizadas: reps,
+                    pesoLevantadoKg: peso
+                });
+            }
+        });
+
+        if(arrayDeSeries.length === 0) {
+            return alert("Por favor, rellena los Kilos de al menos una serie para guardar.");
+        }
+
+        const notaFinal = notasGlobales ? `${notasGlobales} | ${desgloseNotas}` : desgloseNotas;
+
+        const payload = {
+            rutinaId: rutinaId,
+            semana: semanaElegida,
+            duracionMinutos: minutos,
+            notas: notaFinal,
+            registros: arrayDeSeries
+        };
+
+        fetch('/api/entrenamientos/guardar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify(payload)
+        }).then(res => {
+            if(res.ok) {
+                alert("¡Entrenamiento guardado en tu diario!");
+                modalRegistro.hide();
+                cargarHistorial();
+                semanaActiva = semanaElegida;
+            }
+        });
+    }
+
+    // --- 3. LÓGICA DEL DIARIO CON PESTAÑAS ---
+    function cargarHistorial() {
+        fetch('/api/entrenamientos/historial', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(data => {
+                historialCompleto = data;
+                renderizarBotonesSemanas();
+                renderizarTablaDiario();
+            });
+    }
+
+    function renderizarBotonesSemanas() {
+        const contenedor = document.getElementById('filtrosSemanas');
+        contenedor.innerHTML = '';
+
+        if(historialCompleto.length === 0) return;
+
+        // Busca todas las semanas que existan en la BD y las ordena
+        const semanasUnicas = [...new Set(historialCompleto.map(h => h.semanaRutina))].sort((a,b) => a - b);
+
+        if (semanaActiva === null && semanasUnicas.length > 0) {
+            semanaActiva = semanasUnicas[semanasUnicas.length - 1];
+        }
+
+        semanasUnicas.forEach(sem => {
+            const btn = document.createElement('button');
+            btn.className = `btn ${semanaActiva === sem ? 'btn-primary shadow' : 'btn-outline-primary'} fw-bold px-4`;
+            btn.innerText = `Semana ${sem}`;
+            btn.onclick = () => {
+                semanaActiva = sem;
+                renderizarBotonesSemanas();
+                renderizarTablaDiario();
+            };
+            contenedor.appendChild(btn);
+        });
+    }
+
+    function renderizarTablaDiario() {
+        const tbody = document.getElementById('tablaHistorial');
+        tbody.innerHTML = '';
+
+        const datosFiltrados = historialCompleto.filter(h => h.semanaRutina === semanaActiva);
+
+        if(datosFiltrados.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-muted py-4">No hay entrenamientos en esta semana.</td></tr>`;
+            return;
+        }
+
+        datosFiltrados.forEach(h => {
+            tbody.innerHTML += `
+<tr>
+<td><span class="badge bg-secondary">${h.fecha}</span></td>
+<td class="fw-bold text-info">${h.diaRutina}</td>
+<td class="fw-bold">${h.nombreEjercicio}</td>
+<td class="fw-bold text-success h5">${h.pesoUtilizado} Kg</td>
+<td class="fw-bold">Serie ${h.seriesRealizadas}: ${h.repeticionesRealizadas} reps</td>
+<td>
+<button class="btn btn-sm btn-outline-warning" onclick="abrirModalEditar(${h.id}, ${h.pesoUtilizado}, ${h.repeticionesRealizadas})" title="Editar"><i class="bi bi-pencil-fill"></i></button>
+<button class="btn btn-sm btn-outline-danger" onclick="eliminarRegistro(${h.id})" title="Borrar"><i class="bi bi-trash-fill"></i></button>
+</td>
+</tr>
+`;
+        });
+    }
+
+
+    // --- LÓGICA DE EDICIÓN Y BORRADO ---
+    const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+
+    function abrirModalEditar(id, pesoActual, repsActuales) {
+        document.getElementById('editRegistroId').value = id;
+        document.getElementById('editPeso').value = pesoActual;
+        document.getElementById('editReps').value = repsActuales;
+        modalEditar.show();
+    }
+
+    function ejecutarEdicion() {
+        const id = document.getElementById('editRegistroId').value;
+        const peso = document.getElementById('editPeso').value;
+        const reps = document.getElementById('editReps').value;
+
+        fetch(`/api/entrenamientos/${id}?peso=${peso}&reps=${reps}`, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token }
+        }).then(res => {
+            if(res.ok) {
+                modalEditar.hide();
+                cargarHistorial();
+            } else {
+                alert("Error al actualizar el registro");
+            }
+        });
+    }
+
+    function eliminarRegistro(id) {
+        if(confirm("⚠️ ¿Estás seguro de que quieres borrar este registro de tu diario? No podrás deshacerlo.")) {
+            fetch(`/api/entrenamientos/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            }).then(res => {
+                if(res.ok) {
+                    cargarHistorial();
+                } else {
+                    alert("No se pudo eliminar el registro.");
+                }
+            });
+        }
+    }
+
+    // --- 4. CALCULAR FUERZA MÁXIMA (1RM) ---
+    function calcular1RM() {
+        const idEjercicio = document.getElementById('inputEjercicio1RM').value;
+        if(!idEjercicio) return alert("Introduce el ID de un ejercicio de tu tabla de rutinas.");
+
+        fetch(`/api/entrenamientos/1rm/${idEjercicio}`, { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => {
+                if(!res.ok) throw new Error("Aún no tienes registros con peso para este ejercicio.");
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('resultado1RM').style.display = 'block';
+                document.getElementById('peso1RM').innerText = data.pesoMaximoEstimado1RM + ' Kg';
+                document.getElementById('nombreEj1RM').innerText = data.nombreEjercicio;
+                document.getElementById('mensaje1RM').innerText = data.mensajeMotivacional;
+            })
+            .catch(err => alert(err.message));
+    }
+
+    // --- NUEVO: LÓGICA DE LA PESTAÑA DE DIETA ---
+    function cargarDieta() {
+        fetch('/api/dieta/actual', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => {
+                if(res.status === 204) {
+                    document.getElementById('seccionConfigurarDieta').classList.remove('d-none');
+                    document.getElementById('seccionPanelDieta').classList.add('d-none');
+                } else return res.json();
+            })
+            .then(dieta => {
+                if(dieta) mostrarPanelDieta(dieta);
+            });
+    }
+
+    function configurarDieta() {
+        const payload = {
+            altura: document.getElementById('dietaAltura').value,
+            nivelActividad: document.getElementById('dietaActividad').value,
+            alimentosGusta: document.getElementById('dietaGusta').value,
+            alimentosOdia: document.getElementById('dietaOdia').value
+        };
+
+        fetch('/api/dieta/configurar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(dieta => mostrarPanelDieta(dieta));
+    }
+
+    function mostrarPanelDieta(dieta) {
+        document.getElementById('seccionConfigurarDieta').classList.add('d-none');
+        document.getElementById('seccionPanelDieta').classList.remove('d-none');
+
+        document.getElementById('displayCals').innerText = dieta.objetivoCalorias;
+        document.getElementById('displayMant').innerText = dieta.mantenimientoCalorias;
+        document.getElementById('displayPro').innerText = dieta.proteinas + 'g';
+        document.getElementById('displayCarb').innerText = dieta.carbohidratos + 'g';
+        document.getElementById('displayFat').innerText = dieta.grasas + 'g';
+
+        if(dieta.menuSemanal) {
+            document.getElementById('menuIAContenedor').innerText = dieta.menuSemanal;
+        }
+
+        // 🔥 Llama a cargar la lista de pesos al entrar en el panel
+        cargarHistorialPesos();
+    }
+
+    // 🔥 Protegido contra el Error 503 de Gemini
+    function generarMenuIA() {
+        const btn = document.getElementById('btnGenerarDieta');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Cocinando...';
+
+        fetch('/api/dieta/generar-menu', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Los servidores de la IA de Google están saturados ahora mismo (Error 503). Por favor, espere 1 minutito e inténtelo de nuevo.');
+                }
+                return res.text();
+            })
+            .then(menu => {
+                document.getElementById('menuIAContenedor').innerText = menu;
+                btn.disabled = false;
+                btn.innerHTML = '✨ Generar';
+            })
+            .catch(err => {
+                // Si la IA falla, mostramos el error sin bloquear la app
+                document.getElementById('menuIAContenedor').innerHTML = `<span class="text-danger fw-bold">⚠️ ${err.message}</span>`;
+                btn.disabled = false;
+                btn.innerHTML = '✨ Reintentar';
+            });
+    }
+
+    // 🔥 Guarda el peso y actualiza la lista visual y los macros
+    function registrarPesoDieta() {
+        const p = document.getElementById('inputPesoDieta').value;
+        if (!p) return;
+
+        fetch(`/api/dieta/registrar-peso?peso=${p}`, {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(() => {
+                alert("¡Peso registrado correctamente en tu control!");
+                document.getElementById('inputPesoDieta').value = ''; // Limpiamos la cajita
+                cargarDieta(); // Recarga los macros por si el auto-ajuste de Helms hizo efecto
+                cargarHistorialPesos(); // Refresca la listita
+            });
+    }
+
+    // 🔥 Función para pedir la lista de pesos al Backend y pintarla
+    function cargarHistorialPesos() {
+        fetch('/api/dieta/pesos', { headers: { 'Authorization': 'Bearer ' + token } })
+            .then(res => res.json())
+            .then(pesos => {
+                const lista = document.getElementById('listaPesos');
+                lista.innerHTML = '';
+                if(pesos.length === 0) {
+                    lista.innerHTML = '<li class="list-group-item text-muted small px-0">Aún no hay registros de peso.</li>';
+                } else {
+                    // Muestra solo los últimos 5 para que no ocupe toda la pantalla
+                    pesos.slice(0, 5).forEach(p => {
+                        lista.innerHTML += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1 border-0 small">
+                                <span>📅 ${p.fecha}</span>
+                                <span class="badge bg-dark rounded-pill fs-6">${p.peso} kg</span>
+                            </li>`;
+                    });
+                }
+            });
+    }
+
+    // 🔥 Botón rojo para borrar la pantalla y que el usuario vuelva a meter la Altura
+    function forzarRecalculo() {
+        if(confirm("¿Quieres borrar tus macros actuales y volver a calcular la fórmula desde cero con tu nuevo peso?")) {
+            document.getElementById('seccionConfigurarDieta').classList.remove('d-none');
+            document.getElementById('seccionPanelDieta').classList.add('d-none');
+        }
+    }
+
+    // --- OTROS ---
+    function generarRutina() {
+        document.getElementById('btnGenerar').innerHTML = 'Generando...';
+        fetch('/api/rutinas/generar', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } })
+            .then(() => { alert("Rutina Creada"); window.location.reload(); });
+    }
+
+    function cerrarSesion() {
+        localStorage.clear(); window.location.href = '/login';
+    }
+
+    // Iniciar
+    cargarRutinas();
+</script>
+</body>
+</html>

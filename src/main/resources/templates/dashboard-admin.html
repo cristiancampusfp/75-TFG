@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Gestión Total</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">Panel de Administrador - Fitness App</span>
+        <button class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+</nav>
+
+<div class="container bg-white p-4 rounded shadow-sm">
+
+    <!-- PESTAÑAS DE NAVEGACIÓN -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="ejercicios-tab" data-bs-toggle="tab" data-bs-target="#ejercicios" type="button" role="tab">🏋️ Catálogo de Ejercicios</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">👥 Gestión de Usuarios</button>
+        </li>
+    </ul>
+
+    <!-- CONTENIDO DE LAS PESTAÑAS -->
+    <div class="tab-content" id="adminTabsContent">
+
+        <!-- PESTAÑA 1: EJERCICIOS -->
+        <div class="tab-pane fade show active" id="ejercicios" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Catálogo de Ejercicios</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearEjercicio">
+                    + Añadir Nuevo Ejercicio
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Grupo Muscular</th>
+                        <th>Dificultad</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tablaEjerciciosBody">
+                    <tr><td colspan="5" class="text-center">Cargando ejercicios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: USUARIOS -->
+        <div class="tab-pane fade" id="usuarios" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Clientes Registrados</h2>
+                <div>
+                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+                        + Añadir Nuevo Usuario
+                    </button>
+                    <button class="btn btn-success" onclick="cargarUsuarios()">
+                        🔄 Refrescar
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Nivel</th>
+                        <th>Objetivo</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tablaUsuariosBody">
+                    <tr><td colspan="6" class="text-center">Cargando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL CREAR EJERCICIO -->
+<div class="modal fade" id="modalCrearEjercicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Registrar Ejercicio</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCrearEjercicio">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Ejercicio *</label>
+                        <input type="text" id="ejNombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea id="ejDescripcion" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Grupo Muscular *</label>
+                            <select id="ejGrupo" class="form-select" required>
+                                <option value="Pecho">Pecho</option>
+                                <option value="Espalda">Espalda</option>
+                                <option value="Pierna">Pierna</option>
+                                <option value="Brazo">Brazo</option>
+                                <option value="Core">Core</option>
+                                <option value="Cardio">Cardio</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Dificultad *</label>
+                            <select id="ejDificultad" class="form-select" required>
+                                <option value="Principiante">Principiante</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzado">Avanzado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL del Vídeo (Opcional)</label>
+                        <input type="url" id="ejVideo" class="form-control" placeholder="https://youtube.com/...">
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar Ejercicio</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR USUARIO (COMPLETO) -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Registrar Nuevo Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCrearUsuario">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo *</label>
+                        <input type="text" id="newUserNombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico *</label>
+                        <input type="email" id="newUserEmail" class="form-control" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Objetivo *</label>
+                            <select id="newUserObjetivo" class="form-select" required>
+                                <option value="Perder Peso">Perder Peso</option>
+                                <option value="Ganar Masa Muscular">Ganar Masa Muscular</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nivel *</label>
+                            <select id="newUserNivel" class="form-select" required>
+                                <option value="Principiante">Principiante</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzado">Avanzado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Temporal *</label>
+                        <input type="text" id="newUserPassword" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Crear Cuenta de Usuario</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR USUARIO -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Editar Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarUsuario">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" id="editUserNombre" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Objetivo</label>
+                            <select id="editUserObjetivo" class="form-select">
+                                <option value="Perder Peso">Perder Peso</option>
+                                <option value="Ganar Masa Muscular">Ganar Masa Muscular</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nivel</label>
+                            <select id="editUserNivel" class="form-select">
+                                <option value="Principiante">Principiante</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzado">Avanzado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold">Actualizar Datos</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // 1. Control de Seguridad
+    const token = localStorage.getItem('jwtToken');
+    if(!token) {
+        window.location.href = '/login';
+    }
+
+    // ==========================================
+    // LÓGICA DE EJERCICIOS
+    // ==========================================
+    function cargarEjercicios() {
+        fetch('/api/ejercicios', {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if(response.status === 403) {
+                alert("No tienes permisos para ver esto.");
+                window.location.href = '/login';
+                throw new Error("Prohibido");
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('tablaEjerciciosBody');
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aún no hay ejercicios registrados.</td></tr>';
+                return;
+            }
+
+            data.forEach(ej => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${ej.id}</td>
+                        <td class="fw-bold">${ej.nombre}</td>
+                        <td><span class="badge bg-secondary">${ej.grupoMuscular}</span></td>
+                        <td>${ej.dificultad}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="borrarEjercicio(${ej.id})">Borrar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(error => console.error("Error al cargar:", error));
+    }
+
+    document.getElementById('formCrearEjercicio').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nuevoEjercicio = {
+            nombre: document.getElementById('ejNombre').value,
+            descripcion: document.getElementById('ejDescripcion').value,
+            grupoMuscular: document.getElementById('ejGrupo').value,
+            dificultad: document.getElementById('ejDificultad').value,
+            tipoEjercicio: "Fuerza",
+            urlVideo: document.getElementById('ejVideo').value
+        };
+
+        fetch('/api/ejercicios', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(nuevoEjercicio)
+        })
+        .then(response => {
+            if(response.ok) {
+                document.getElementById('formCrearEjercicio').reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearEjercicio'));
+                modal.hide();
+                cargarEjercicios();
+            } else {
+                alert('Error al guardar. Asegúrate de ser Administrador.');
+            }
+        });
+    });
+
+    function borrarEjercicio(id) {
+        if(confirm('¿Seguro que deseas eliminar este ejercicio permanentemente?')) {
+            fetch('/api/ejercicios/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(response => {
+                if(response.ok) cargarEjercicios();
+                else alert("Error al borrar.");
+            });
+        }
+    }
+
+    // ==========================================
+    // LÓGICA DE USUARIOS (CRUD COMPLETO)
+    // ==========================================
+    function cargarUsuarios() {
+        fetch('/api/admin/usuarios', {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(response => {
+            if(!response.ok) throw new Error("Error al cargar usuarios");
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.getElementById('tablaUsuariosBody');
+            tbody.innerHTML = '';
+
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay clientes registrados.</td></tr>';
+                return;
+            }
+
+            data.forEach(user => {
+                const btnEditar = `<button class="btn btn-warning btn-sm me-1" onclick="abrirModalEditar(${user.id}, '${user.nombre}', '${user.objetivo || ''}', '${user.nivelExperiencia || ''}')">Editar</button>`;
+                const btnBorrar = `<button class="btn btn-outline-danger btn-sm" onclick="borrarUsuario(${user.id})">Banear</button>`;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td class="fw-bold">${user.nombre}</td>
+                        <td>${user.email}</td>
+                        <td><span class="badge bg-info text-dark">${user.nivelExperiencia || 'N/A'}</span></td>
+                        <td>${user.objetivo || 'N/A'}</td>
+                        <td>${btnEditar} ${btnBorrar}</td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // --- Función para CREAR Usuario ---
+    document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Ahora enviamos también el objetivo y el nivel
+        const nuevoUsuario = {
+            nombre: document.getElementById('newUserNombre').value,
+            email: document.getElementById('newUserEmail').value,
+            password: document.getElementById('newUserPassword').value,
+            objetivo: document.getElementById('newUserObjetivo').value,
+            nivelExperiencia: document.getElementById('newUserNivel').value
+        };
+
+        fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(nuevoUsuario)
+        })
+        .then(response => {
+            if(response.ok) {
+                document.getElementById('formCrearUsuario').reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
+                modal.hide();
+                cargarUsuarios();
+                alert("Usuario creado con éxito.");
+            } else {
+                response.text().then(text => alert("Error al crear usuario: " + text));
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // --- Función para BORRAR Usuario ---
+    function borrarUsuario(id) {
+        if(confirm('¿Atención! ¿Estás seguro de que deseas eliminar a este usuario de la base de datos? Esto borrará también sus rutinas.')) {
+            fetch('/api/admin/usuarios/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(response => {
+                if(response.ok) {
+                    alert("Usuario eliminado correctamente.");
+                    cargarUsuarios();
+                } else {
+                    alert("Error al eliminar el usuario.");
+                }
+            });
+        }
+    }
+
+    // --- Funciones para EDITAR Usuario ---
+    let modalEditarInstancia;
+
+    function abrirModalEditar(id, nombre, objetivo, nivel) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editUserNombre').value = nombre;
+        if(objetivo) document.getElementById('editUserObjetivo').value = objetivo;
+        if(nivel) document.getElementById('editUserNivel').value = nivel;
+
+        const modalElement = document.getElementById('modalEditarUsuario');
+        if (!modalEditarInstancia) {
+            modalEditarInstancia = new bootstrap.Modal(modalElement);
+        }
+        modalEditarInstancia.show();
+    }
+
+    document.getElementById('formEditarUsuario').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('editUserId').value;
+        const datosActualizados = {
+            nombre: document.getElementById('editUserNombre').value,
+            objetivo: document.getElementById('editUserObjetivo').value,
+            nivelExperiencia: document.getElementById('editUserNivel').value
+        };
+
+        fetch('/api/admin/usuarios/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(datosActualizados)
+        })
+        .then(response => {
+            if(response.ok) {
+                modalEditarInstancia.hide();
+                cargarUsuarios();
+                alert("Usuario actualizado con éxito.");
+            } else {
+                alert("Error al actualizar el usuario.");
+            }
+        });
+    });
+
+    // 5. Cerrar sesión
+    function cerrarSesion() {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('usuarioDatos');
+        window.location.href = '/login';
+    }
+
+    // Ejecutar al iniciar la página
+    cargarEjercicios();
+    cargarUsuarios();
+</script>
+</body>
+</html>
