@@ -4,6 +4,7 @@ import com.fitness.dto.AuthResponse;
 import com.fitness.dto.LoginRequest;
 import com.fitness.dto.RegisterRequest;
 import com.fitness.service.AuthService;
+import jakarta.validation.Valid; // 🔥 IMPORTANTE: Importamos la librería de validación
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    //  AÑADIMOS @Valid para que se ejecuten las reglas del DTO antes de entrar al método
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         try {
             authService.registrarUsuario(request);
             return ResponseEntity.ok("Usuario registrado con éxito");
@@ -25,9 +27,9 @@ public class AuthController {
         }
     }
 
-    // NUEVO ENDPOINT: Recibe el email y la contraseña
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    // 🔥 Aquí también lo ponemos por si en el futuro le pones reglas al LoginRequest
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(response); // Devuelve el Token y los datos del usuario 200 OK
