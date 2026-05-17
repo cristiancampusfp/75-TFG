@@ -34,6 +34,8 @@ public class AuthService {
         nuevoUsuario.setEdad(request.getEdad());
         nuevoUsuario.setPeso(request.getPeso());
         nuevoUsuario.setAltura(request.getAltura());
+        // 🔥 AQUÍ ESTÁ LA MAGIA: Guardamos el sexo en el usuario
+        nuevoUsuario.setSexo(request.getSexo());
         nuevoUsuario.setObjetivo(request.getObjetivo());
         nuevoUsuario.setNivelExperiencia(request.getNivelExperiencia());
         nuevoUsuario.setDiasDisponibles(request.getDiasDisponibles());
@@ -57,7 +59,6 @@ public class AuthService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        // CORREGIDO: Ahora le pasamos el email y el nombre del rol para que se guarde en el JWT
         String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().getNombre());
 
         UsuarioDTO dto = new UsuarioDTO();
