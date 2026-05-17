@@ -4,6 +4,7 @@ import com.fitness.dto.EntrenamientoRequestDTO;
 import com.fitness.dto.FuerzaMaximaDTO;
 import com.fitness.dto.HistorialEntrenamientoDTO;
 import com.fitness.dto.RegistroEjercicioRequestDTO;
+import com.fitness.exception.ResourceNotFoundException;
 import com.fitness.model.EntrenamientoRealizado;
 import com.fitness.model.Rutina;
 import com.fitness.model.RutinaEjercicio;
@@ -34,10 +35,10 @@ public class EntrenamientoService {
     public void guardarEntrenamiento(String emailUsuario, EntrenamientoRequestDTO dto) {
 
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         Rutina rutina = rutinaRepository.findById(dto.getRutinaId())
-                .orElseThrow(() -> new RuntimeException("Rutina no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Rutina no encontrada"));
 
         LocalDate fechaHoy = LocalDate.now();
 
@@ -45,7 +46,7 @@ public class EntrenamientoService {
             for (RegistroEjercicioRequestDTO regDTO : dto.getRegistros()) {
 
                 RutinaEjercicio rutinaEjercicio = rutinaEjercicioRepository.findById(regDTO.getEjercicioId())
-                        .orElseThrow(() -> new RuntimeException("Ejercicio de rutina no encontrado"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Ejercicio de rutina no encontrado"));
 
                 EntrenamientoRealizado registro = new EntrenamientoRealizado();
                 registro.setUsuario(usuario);
@@ -60,7 +61,6 @@ public class EntrenamientoService {
                 registro.setNotas(dto.getNotas());
                 registro.setCompletado(true);
 
-                // 🔥 NUEVO: Guardamos la semana explícita elegida por el usuario
                 registro.setSemanaEntrenamiento(dto.getSemana() != null ? dto.getSemana() : 1);
 
                 entrenamientoRepository.save(registro);
@@ -71,7 +71,7 @@ public class EntrenamientoService {
     @Transactional(readOnly = true)
     public List<HistorialEntrenamientoDTO> obtenerHistorialUsuario(String emailUsuario) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         List<EntrenamientoRealizado> historial = entrenamientoRepository
                 .findByUsuarioIdOrderByFechaEntrenamientoDesc(usuario.getId());
@@ -88,7 +88,6 @@ public class EntrenamientoService {
             dto.setPesoUtilizado(h.getPesoUtilizado());
             dto.setTiempoSesionMinutos(h.getTiempoSesionMinutos());
 
-            // 🔥 AHORA LEEMOS LA SEMANA DESDE EL NUEVO CAMPO QUE ELIGIÓ EL USUARIO
             dto.setSemanaRutina(h.getSemanaEntrenamiento() != null ? h.getSemanaEntrenamiento() : 1);
 
             if (h.getRutinaEjercicio() != null) {
@@ -104,7 +103,7 @@ public class EntrenamientoService {
     @Transactional(readOnly = true)
     public FuerzaMaximaDTO calcular1RM(String emailUsuario, Long rutinaEjercicioId) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         List<EntrenamientoRealizado> historial = entrenamientoRepository
                 .findByUsuarioIdOrderByFechaEntrenamientoDesc(usuario.getId());
@@ -114,12 +113,12 @@ public class EntrenamientoService {
                 .collect(Collectors.toList());
 
         if (historialDelEjercicio.isEmpty()) {
-            throw new RuntimeException("Aún no tienes registros con peso para este ejercicio.");
+            throw new IllegalArgumentException("Aún no tienes registros con peso para este ejercicio.");
         }
 
         EntrenamientoRealizado mejorLevantamiento = historialDelEjercicio.stream()
                 .max(Comparator.comparingDouble(h -> h.getPesoUtilizado() * h.getRepeticionesRealizadas()))
-                .orElseThrow(() -> new RuntimeException("Error al calcular el mejor levantamiento."));
+                .orElseThrow(() -> new IllegalArgumentException("Error al calcular el mejor levantamiento."));
 
         double peso = mejorLevantamiento.getPesoUtilizado();
         int reps = mejorLevantamiento.getRepeticionesRealizadas();
@@ -143,13 +142,13 @@ public class EntrenamientoService {
     @Transactional
     public void eliminarRegistro(String emailUsuario, Long registroId) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         EntrenamientoRealizado registro = entrenamientoRepository.findById(registroId)
-                .orElseThrow(() -> new RuntimeException("Registro no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado"));
 
         if (!registro.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("No tienes permiso para eliminar este registro");
+            throw new IllegalArgumentException("No tienes permiso para eliminar este registro");
         }
 
         entrenamientoRepository.delete(registro);
@@ -158,13 +157,13 @@ public class EntrenamientoService {
     @Transactional
     public void editarRegistro(String emailUsuario, Long registroId, Double nuevoPeso, Integer nuevasReps) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         EntrenamientoRealizado registro = entrenamientoRepository.findById(registroId)
-                .orElseThrow(() -> new RuntimeException("Registro no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Registro no encontrado"));
 
         if (!registro.getUsuario().getId().equals(usuario.getId())) {
-            throw new RuntimeException("No tienes permiso para editar este registro");
+            throw new IllegalArgumentException("No tienes permiso para editar este registro");
         }
 
         registro.setPesoUtilizado(nuevoPeso);
