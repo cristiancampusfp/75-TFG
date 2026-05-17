@@ -97,7 +97,7 @@ public class RutinaService {
 
     private void parsearYGuardarEjercicios(String jsonIA, Rutina rutina, List<Ejercicio> catalogo) {
         try {
-            // 🔥 EXTRACCIÓN INTELIGENTE: Buscamos solo lo que está entre la primera '{' y la última '}'
+            // 🔥 EXTRACCIÓN INTELIGENTE
             String jsonLimpio = jsonIA;
             int startIndex = jsonLimpio.indexOf("{");
             int endIndex = jsonLimpio.lastIndexOf("}");
@@ -118,12 +118,13 @@ public class RutinaService {
                         .findFirst()
                         .orElse(null);
 
-                // Si la IA inventa un ejercicio nuevo, lo creamos
+                // 🔥 PROTECCIÓN DEL CATÁLOGO (Requisito de David)
                 if (ejBD == null) {
                     ejBD = new Ejercicio();
                     ejBD.setNombre(nombreIA);
                     ejBD.setGrupoMuscular(ejIA.has("grupoMuscular") ? ejIA.getString("grupoMuscular") : "General");
-                    ejBD.setActivo(true);
+                    ejBD.setActivo(false); // No lo mostramos en el catálogo oficial
+                    ejBD.setPendienteRevision(true); // Marca de agua de la IA
                     ejBD = ejercicioRepository.save(ejBD);
                 }
 
@@ -131,9 +132,15 @@ public class RutinaService {
                 re.setRutina(rutina);
                 re.setEjercicio(ejBD);
 
+                // 🔥 DEFENSIVIDAD CONTRA JSON INCOMPLETO (Requisito de David)
                 re.setSemana(ejIA.has("semana") ? ejIA.getInt("semana") : 1);
+                re.setDiaSemana(ejIA.has("dia") ? ejIA.getInt("dia") : 1);
+                re.setOrden(ejIA.has("orden") ? ejIA.getInt("orden") : (i + 1));
+                re.setSeries(ejIA.has("series") ? ejIA.getInt("series") : 3);
+                re.setDescansoSegundos(ejIA.has("descanso") ? ejIA.getInt("descanso") : 90);
+                re.setPesoRecomendado(0.0);
 
-                // 🔥 LÓGICA DE RANGOS A PRUEBA DE ERRORES:
+                // LÓGICA DE RANGOS A PRUEBA DE ERRORES:
                 String rangoRaw = "";
                 if (ejIA.has("repsRango")) {
                     rangoRaw = String.valueOf(ejIA.get("repsRango"));
@@ -141,7 +148,7 @@ public class RutinaService {
                     rangoRaw = String.valueOf(ejIA.get("repeticiones"));
                 }
 
-                // Si la IA manda un número suelto (ej: 10), lo convertimos a rango manualmente
+                // Si la IA manda un número suelto, lo convertimos a rango manualmente
                 if (rangoRaw.matches("\\d+")) {
                     int n = Integer.parseInt(rangoRaw);
                     if (n <= 5) rangoRaw = "3-5";
@@ -149,21 +156,16 @@ public class RutinaService {
                     else if (n <= 12) rangoRaw = "10-12";
                     else rangoRaw = "12-15";
                 } else if (rangoRaw.isEmpty()) {
-                    rangoRaw = "8-12"; // Valor por defecto
+                    rangoRaw = "8-12";
                 }
 
                 re.setRepeticiones(rangoRaw);
-                re.setDiaSemana(ejIA.getInt("dia"));
-                re.setOrden(ejIA.getInt("orden"));
-                re.setSeries(ejIA.getInt("series"));
-                re.setDescansoSegundos(ejIA.getInt("descanso"));
-                re.setPesoRecomendado(0.0);
 
                 rutinaEjercicioRepository.save(re);
             }
         } catch (Exception e) {
             System.err.println("Error parseando JSON: " + e.getMessage());
-            throw new RuntimeException("Error en el formato de la IA.");
+            throw new RuntimeException("Error en el formato de la IA. Por favor, reintenta.");
         }
     }
 

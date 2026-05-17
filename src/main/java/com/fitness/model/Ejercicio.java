@@ -43,6 +43,10 @@ public class Ejercicio {
     @Column(columnDefinition = "boolean default true")
     private Boolean activo = true;
 
+    // 🔥 NUEVO CAMPO: Para marcar las alucinaciones de la IA
+    @Column(name = "pendiente_revision", columnDefinition = "boolean default false")
+    private Boolean pendienteRevision = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
