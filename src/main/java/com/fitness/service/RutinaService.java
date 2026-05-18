@@ -63,16 +63,18 @@ public class RutinaService {
         String objetivo = usuario.getObjetivo() != null ? usuario.getObjetivo() : "Ganancia muscular";
         String nivel = usuario.getNivelExperiencia() != null ? usuario.getNivelExperiencia() : "Intermedio";
 
+        // 🔥 PROMPT ACTUALIZADO: Instrucciones estrictas de generar UNA SOLA SEMANA
         String prompt = "Actúa como un entrenador personal experto en Powerbuilding y Biomecánica. " +
-                "Genera un MESOCICLO DE 4 SEMANAS para un usuario nivel " + nivel + " con objetivo: " + objetivo + " entrenando " + dias + " días a la semana.\n\n" +
+                "Genera UN MICROCICLO BASE (1 SOLA SEMANA) para un usuario nivel " + nivel + " con objetivo: " + objetivo + " entrenando " + dias + " días a la semana.\n\n" +
                 "REGLAS DE ORO:\n" +
-                "1. SELECCIÓN DE EJERCICIOS: Tienes TOTAL LIBERTAD creativa. Usa los mejores ejercicios posibles (barras, mancuernas, poleas, máquinas) según la ciencia.\n" +
-                "2. ESTRUCTURA: 1-2 BÁSICOS pesados, 2-3 COMPLEMENTARIOS, 1-2 AISLAMIENTO.\n" +
-                "3. RANGOS DE REPETICIONES (OBLIGATORIO):\n" +
+                "1. SOBRECARGA PROGRESIVA: El usuario repetirá esta única semana durante todo su mesociclo. POR TANTO, GENERA SOLO LOS EJERCICIOS DE LA SEMANA 1. El campo 'semana' SIEMPRE DEBE SER 1.\n" +
+                "2. SELECCIÓN DE EJERCICIOS: Usa los mejores ejercicios posibles (barras, mancuernas, poleas, máquinas) según la ciencia.\n" +
+                "3. ESTRUCTURA: 1-2 BÁSICOS pesados, 2-3 COMPLEMENTARIOS, 1-2 AISLAMIENTO.\n" +
+                "4. RANGOS DE REPETICIONES (OBLIGATORIO):\n" +
                 "   - BÁSICOS: Usa rangos de fuerza como '5-8' o '3-5'.\n" +
                 "   - COMPLEMENTARIOS: Usa '8-10' o '10-12'.\n" +
                 "   - AISLAMIENTO: Usa '12-15' o '15-20'.\n" +
-                "4. REGLA ESTRICTA DE FORMATO: Responde EXCLUSIVAMENTE con el JSON. NO digas 'Hola', NO digas 'Aquí tienes tu rutina'. SOLO EL JSON puro que empiece por la llave { y termine por la llave }.\n\n" +
+                "5. REGLA ESTRICTA DE FORMATO: Responde EXCLUSIVAMENTE con el JSON. NO digas 'Hola', NO digas 'Aquí tienes tu rutina'. SOLO EL JSON puro que empiece por la llave { y termine por la llave }.\n\n" +
                 "ESTRUCTURA JSON OBLIGATORIA:\n" +
                 "{\"ejercicios\": [{\"nombre\": \"Nombre Exacto\", \"grupoMuscular\": \"Pecho\", \"semana\": 1, \"dia\": 1, \"orden\": 1, \"series\": 3, \"repsRango\": \"5-8\", \"descanso\": 180}]}";
 
@@ -80,8 +82,8 @@ public class RutinaService {
 
         Rutina rutina = new Rutina();
         rutina.setUsuario(usuario);
-        rutina.setNombre("Mesociclo PRO: " + objetivo);
-        rutina.setDescripcion("Programa de 4 semanas con rotación de ejercicios y rangos optimizados.");
+        rutina.setNombre("Rutina Base PRO: " + objetivo);
+        rutina.setDescripcion("Microciclo base optimizado. Repite esta rutina semanalmente aplicando sobrecarga progresiva en tu diario de entrenamientos.");
         rutina.setDiasSemana(dias);
         rutina.setIntensidad(calcularIntensidad(nivel));
         rutina.setVolumenSemanal(dias * 5);
@@ -97,7 +99,7 @@ public class RutinaService {
 
     private void parsearYGuardarEjercicios(String jsonIA, Rutina rutina, List<Ejercicio> catalogo) {
         try {
-            // 🔥 EXTRACCIÓN INTELIGENTE
+            // EXTRACCIÓN INTELIGENTE
             String jsonLimpio = jsonIA;
             int startIndex = jsonLimpio.indexOf("{");
             int endIndex = jsonLimpio.lastIndexOf("}");
@@ -118,7 +120,7 @@ public class RutinaService {
                         .findFirst()
                         .orElse(null);
 
-                // 🔥 PROTECCIÓN DEL CATÁLOGO (Requisito de David)
+                // PROTECCIÓN DEL CATÁLOGO (Requisito de David)
                 if (ejBD == null) {
                     ejBD = new Ejercicio();
                     ejBD.setNombre(nombreIA);
@@ -132,8 +134,9 @@ public class RutinaService {
                 re.setRutina(rutina);
                 re.setEjercicio(ejBD);
 
-                // 🔥 DEFENSIVIDAD CONTRA JSON INCOMPLETO (Requisito de David)
-                re.setSemana(ejIA.has("semana") ? ejIA.getInt("semana") : 1);
+                // 🔥 CANDADO DE SEGURIDAD: Forzamos a que siempre se guarde como Semana 1
+                re.setSemana(1);
+
                 re.setDiaSemana(ejIA.has("dia") ? ejIA.getInt("dia") : 1);
                 re.setOrden(ejIA.has("orden") ? ejIA.getInt("orden") : (i + 1));
                 re.setSeries(ejIA.has("series") ? ejIA.getInt("series") : 3);
