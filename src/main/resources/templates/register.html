@@ -3,50 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - FitnessApp</title>
+    <title>Registro - FitnessApp PRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .card-registro { max-width: 600px; margin: 50px auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* ==========================================
+           TEMA PREMIUM: MIDNIGHT BLUE
+           ========================================== */
+        body {
+            background: linear-gradient(135deg, #0B132B 0%, #040711 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem 0; /* Padding para que no se pegue arriba y abajo en móviles */
+        }
+
+        /* Tarjeta de Registro */
+        .card-registro {
+            width: 100%;
+            max-width: 650px;
+            background-color: #1C2541;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            padding: 2.5rem !important;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Título */
+        .card-registro h2 {
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        /* Textos y Labels */
+        .form-label {
+            color: #a0aec0;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        /* Inputs y Selects */
+        .form-control, .form-select {
+            background-color: #0B132B;
+            border: 1px solid #2A3B5C;
+            color: #ffffff;
+            border-radius: 10px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Arreglar el color de las opciones del select */
+        .form-select option {
+            background-color: #0B132B;
+            color: #ffffff;
+        }
+
+        /* Efecto Focus */
+        .form-control:focus, .form-select:focus {
+            background-color: #0B132B;
+            color: #ffffff;
+            border-color: #3A86FF;
+            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+        }
+
+        /* Parche Autofill Chrome */
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px #0B132B inset !important;
+            -webkit-text-fill-color: white !important;
+        }
+
+        /* Botón Principal */
+        .btn-primary {
+            background-color: #3A86FF;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #4CC9F0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
+        }
+
+        /* Enlaces */
+        .text-decoration-none {
+            color: #4CC9F0;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+        .text-decoration-none:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="card card-registro p-4">
-        <h2 class="text-center mb-4">Crea tu cuenta</h2>
+<div class="container d-flex justify-content-center">
+    <div class="card card-registro">
+        <h2 class="text-center mb-4">⚡ Crea tu cuenta PRO</h2>
 
-        <div id="alerta" class="alert d-none" role="alert"></div>
+        <div id="alerta" class="alert d-none fw-bold text-center" role="alert"></div>
 
         <form id="registroForm">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nombre completo</label>
-                    <input type="text" class="form-control" id="nombre" required>
+                    <input type="text" class="form-control" id="nombre" placeholder="Ej: Juan Pérez" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" required>
+                    <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
                 </div>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" required>
+                <input type="password" class="form-control" id="password" placeholder="••••••••" required>
             </div>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Edad</label>
-                    <input type="number" class="form-control" id="edad" required>
+                    <input type="number" class="form-control" id="edad" placeholder="Años" required>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Peso (kg)</label>
-                    <input type="number" step="0.1" class="form-control" id="peso" required>
+                    <input type="number" step="0.1" class="form-control" id="peso" placeholder="Ej: 75.5" required>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Altura (m)</label>
-                    <input type="number" step="0.01" class="form-control" id="altura" required>
+                    <input type="number" step="0.01" class="form-control" id="altura" placeholder="Ej: 1.75" required>
                 </div>
             </div>
 
@@ -71,7 +171,7 @@
 
             <div class="row mb-4">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="form-label">Sexo (Para cálculo metabólico)</label>
+                    <label class="form-label">Sexo (Metabolismo)</label>
                     <select class="form-select" id="sexo" required>
                         <option value="" disabled selected>Selecciona...</option>
                         <option value="MASCULINO">Masculino</option>
@@ -79,12 +179,12 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Días disponibles (semana)</label>
-                    <input type="number" class="form-control" id="diasDisponibles" min="1" max="7" required>
+                    <label class="form-label">Días disponibles (Semana)</label>
+                    <input type="number" class="form-control" id="diasDisponibles" min="1" max="7" placeholder="Ej: 4" required>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-3">Registrarse</button>
+            <button type="submit" class="btn btn-primary w-100 mb-4">COMPLETAR REGISTRO</button>
             <div class="text-center">
                 <a href="/login" class="text-decoration-none">¿Ya tienes cuenta? Inicia sesión aquí</a>
             </div>
@@ -94,9 +194,8 @@
 
 <script>
     document.getElementById('registroForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Evita que la página recargue
+        e.preventDefault();
 
-        // Recogemos los datos del formulario, ¡incluido el sexo!
         const datos = {
             nombre: document.getElementById('nombre').value,
             email: document.getElementById('email').value,
@@ -104,7 +203,7 @@
             edad: parseInt(document.getElementById('edad').value),
             peso: parseFloat(document.getElementById('peso').value),
             altura: parseFloat(document.getElementById('altura').value),
-            sexo: document.getElementById('sexo').value, // 🔥 DATO AÑADIDO
+            sexo: document.getElementById('sexo').value,
             objetivo: document.getElementById('objetivo').value,
             nivelExperiencia: document.getElementById('nivelExperiencia').value,
             diasDisponibles: parseInt(document.getElementById('diasDisponibles').value)
@@ -112,7 +211,6 @@
 
         const alerta = document.getElementById('alerta');
 
-        // Enviamos los datos al Backend (Spring Boot)
         fetch('/api/auth/register', {
             method: 'POST',
             headers: {
@@ -122,16 +220,16 @@
         })
             .then(response => {
                 if (response.ok) {
-                    alerta.className = 'alert alert-success';
+                    alerta.className = 'alert alert-success mt-3';
                     alerta.textContent = '¡Registro completado! Redirigiendo...';
                     alerta.classList.remove('d-none');
-                    setTimeout(() => window.location.href = '/login', 2000); // Redirige al login en 2s
+                    setTimeout(() => window.location.href = '/login', 2000);
                 } else {
                     return response.text().then(text => { throw new Error(text) });
                 }
             })
             .catch(error => {
-                alerta.className = 'alert alert-danger';
+                alerta.className = 'alert alert-danger mt-3';
                 alerta.textContent = error.message || 'Error al registrar el usuario';
                 alerta.classList.remove('d-none');
             });
