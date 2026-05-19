@@ -1,5 +1,6 @@
 package com.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +19,7 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // En BBDD es BIGINT
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String nombre;
@@ -27,7 +30,6 @@ public class Usuario {
     @Column(nullable = false, length = 255)
     private String password;
 
-    // Relación exacta con tu Foreign Key "rol_id"
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
@@ -50,26 +52,39 @@ public class Usuario {
     private Integer diasDisponibles;
 
     @Column(length = 10)
-    private String sexo; // "MASCULINO" o "FEMENINO"
+    private String sexo;
 
-    @Column(name = "tipo_suscripcion", length = 20)
+    @Column(length = 20)
     private String tipoSuscripcion;
 
     @Column(columnDefinition = "boolean default true")
     private Boolean activo = true;
 
-    @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Esto asegura que, justo antes de guardar en base de datos por primera vez, asigne la fecha de registro
+    // ==========================================================
+    // 🔥 RELACIONES CON CASCADA PARA EL BORRADO Y @JsonIgnore 🔥
+    // ==========================================================
+
+    @JsonIgnore // Ignorado en el JSON para que no de error de bucle
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rutina> rutinas = new ArrayList<>();
+
+    @JsonIgnore // Ignorado en el JSON para que no de error de bucle
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Dieta dieta;
+
+    @JsonIgnore // Ignorado en el JSON para que no de error de bucle
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RegistroPeso> historialPesos = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         if (this.fechaRegistro == null) {

@@ -166,12 +166,24 @@
                     <p class="text-muted">Utilizaremos la ciencia de Eric Helms para calcular tus macros según tu objetivo.</p>
                     <hr style="border-color: #2A3B5C;">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Altura (en metros, ej: 1.75)</label>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Altura (en m, ej: 1.75)</label>
                             <input type="number" step="0.01" id="dietaAltura" class="form-control" placeholder="1.80">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Nivel de Actividad</label>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-warning">Peso actual (kg)</label>
+                            <input type="number" step="0.1" id="dietaPeso" class="form-control" placeholder="Ej: 75.5">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-info">Objetivo</label>
+                            <select id="dietaObjetivo" class="form-select">
+                                <option value="Perder peso">Perder grasa</option>
+                                <option value="Mantener">Mantener</option>
+                                <option value="Ganar músculo">Ganar masa muscular</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label fw-bold">Nivel de Actividad Semanal</label>
                             <select id="dietaActividad" class="form-select">
                                 <option value="sedentario">Sedentario (Poco ejercicio)</option>
                                 <option value="ligero" selected>Ligero (2-3 días/semana)</option>
@@ -188,7 +200,7 @@
                             <textarea id="dietaOdia" class="form-control" rows="2" placeholder="Brócoli, pescado, champiñones..."></textarea>
                         </div>
                     </div>
-                    <button class="btn btn-primary fw-bold mt-2" onclick="configurarDieta()">Calcular Macros</button>
+                    <button class="btn btn-primary fw-bold mt-2" onclick="configurarDieta()">Guardar Configuración y Calcular Macros</button>
                 </div>
             </div>
 
@@ -220,8 +232,8 @@
                             </div>
                             <h6 class="fw-bold mt-2" style="color:#a0aec0;">Últimos registros:</h6>
                             <ul id="listaPesos" class="list-group list-group-flush mb-3"></ul>
-                            <button class="btn btn-outline-danger btn-sm w-100 mt-auto fw-bold" onclick="forzarRecalculo()">
-                                ⚙️ Forzar recálculo
+                            <button class="btn btn-outline-info btn-sm w-100 mt-auto fw-bold" onclick="forzarRecalculo()">
+                                ⚙️ Reconfigurar Dieta y Objetivo
                             </button>
                         </div>
                     </div>
@@ -383,7 +395,6 @@
     let historialCompleto = [];
     let semanaActiva = null;
 
-    // 🔥 FUNCIÓN ACTUALIZADA PARA QUEDARNOS SOLO CON LA ÚLTIMA RUTINA Y AGRUPAR POR DÍAS
     function cargarRutinas() {
         fetch('/api/rutinas', { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
@@ -396,7 +407,6 @@
                     return;
                 }
 
-                // Nos quedamos exclusivamente con la última rutina del array
                 const ultimaRutina = data[data.length - 1];
 
                 let html = `
@@ -420,7 +430,6 @@
 </thead>
 <tbody>`;
 
-                // Agrupamos los ejercicios por nombre de día (Lunes, Martes, etc.)
                 const ejerciciosPorDia = {};
                 ultimaRutina.ejercicios.forEach(ej => {
                     const dia = ej.nombreDia ? ej.nombreDia.replace(/Semana \d+ /gi, '').trim() : "Día " + ej.diaSemana;
@@ -428,7 +437,6 @@
                     ejerciciosPorDia[dia].push(ej);
                 });
 
-                // Recorremos el objeto para pintar las filas ordenadamente
                 Object.keys(ejerciciosPorDia).forEach(dia => {
                     ejerciciosPorDia[dia].forEach(ej => {
                         html += `
@@ -681,9 +689,20 @@
             });
     }
 
+    // 🔥 JS ACTUALIZADO: RECOGE EL PESO Y EL OBJETIVO DEL FORMULARIO 🔥
     function configurarDieta() {
+        const pesoValue = document.getElementById('dietaPeso').value;
+        const alturaValue = document.getElementById('dietaAltura').value;
+
+        if(!pesoValue || !alturaValue) {
+            alert("Por favor, introduce tu peso y tu altura para calcular los macros.");
+            return;
+        }
+
         const payload = {
-            altura: document.getElementById('dietaAltura').value,
+            altura: parseFloat(alturaValue),
+            pesoActual: parseFloat(pesoValue),
+            objetivo: document.getElementById('dietaObjetivo').value,
             nivelActividad: document.getElementById('dietaActividad').value,
             alimentosGusta: document.getElementById('dietaGusta').value,
             alimentosOdia: document.getElementById('dietaOdia').value
@@ -695,7 +714,11 @@
             body: JSON.stringify(payload)
         })
             .then(res => res.json())
-            .then(dieta => mostrarPanelDieta(dieta));
+            .then(dieta => {
+                alert("¡Configuración guardada y dieta actualizada!");
+                mostrarPanelDieta(dieta);
+            })
+            .catch(err => alert("Error al guardar la dieta. Asegúrate de que tu backend esté preparado."));
     }
 
     function mostrarPanelDieta(dieta) {
@@ -778,11 +801,10 @@
             });
     }
 
+    // 🔥 JS ACTUALIZADO: EL BOTÓN DE RECONFIGURAR VUELVE A MOSTRAR EL FORMULARIO 🔥
     function forzarRecalculo() {
-        if(confirm("¿Quieres borrar tus macros actuales y volver a calcular la fórmula desde cero con tu nuevo peso?")) {
-            document.getElementById('seccionConfigurarDieta').classList.remove('d-none');
-            document.getElementById('seccionPanelDieta').classList.add('d-none');
-        }
+        document.getElementById('seccionConfigurarDieta').classList.remove('d-none');
+        document.getElementById('seccionPanelDieta').classList.add('d-none');
     }
 
     function generarRutina() {

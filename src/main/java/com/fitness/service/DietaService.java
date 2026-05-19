@@ -28,7 +28,33 @@ public class DietaService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 1. Mifflin-St Jeor: (10 * peso) + (6.25 * altura_cm) - (5 * edad) + s
+        // 🔥 1. ACTUALIZACIÓN DINÁMICA DEL PERFIL (Peso, Altura y Objetivo)
+        if (dto.getPesoActual() != null) {
+            usuario.setPeso(dto.getPesoActual());
+        }
+        if (dto.getAltura() != null) {
+            usuario.setAltura(dto.getAltura());
+        }
+        if (dto.getObjetivo() != null) {
+            String objRaw = dto.getObjetivo().toUpperCase();
+            if (objRaw.contains("GANAR") || objRaw.contains("MUSCULO") || objRaw.contains("MÚSCULO")) {
+                usuario.setObjetivo("GANAR_MUSCULO");
+            } else if (objRaw.contains("PERDER") || objRaw.contains("GRASA") || objRaw.contains("PESO")) {
+                usuario.setObjetivo("PERDER_GRASA");
+            } else {
+                usuario.setObjetivo("MANTENER");
+            }
+        }
+        usuarioRepository.save(usuario);
+
+        // 🔥 2. REGISTRO AUTOMÁTICO DEL PESO EN EL HISTORIAL DEL USUARIO
+        RegistroPeso nuevoRegistro = new RegistroPeso();
+        nuevoRegistro.setUsuario(usuario);
+        nuevoRegistro.setPeso(usuario.getPeso());
+        nuevoRegistro.setFecha(LocalDate.now());
+        registroPesoRepository.save(nuevoRegistro);
+
+        // 3. Mifflin-St Jeor: (10 * peso) + (6.25 * altura_cm) - (5 * edad) + s
         // Convertimos altura (metros en BBDD) a centímetros (para la fórmula)
         double alturaCm = usuario.getAltura() * 100;
         double bmr = (10 * usuario.getPeso()) + (6.25 * alturaCm) - (5 * usuario.getEdad());
@@ -50,7 +76,7 @@ public class DietaService {
 
         int mantenimiento = (int) (bmr * factorActividad);
 
-        // 2. Ajuste por Objetivo (Ganar Masa Muscular +300 / Perder -500)
+        // 4. Ajuste por Objetivo (Ganar Masa Muscular +300 / Perder -500)
         int objetivoCals = mantenimiento;
         if ("GANAR_MUSCULO".equalsIgnoreCase(usuario.getObjetivo())) {
             objetivoCals += 300;
@@ -58,13 +84,13 @@ public class DietaService {
             objetivoCals -= 500;
         }
 
-        // 3. Reparto Macros (Filosofía Eric Helms)
+        // 5. Reparto Macros (Filosofía Eric Helms)
         int pro = (int) (usuario.getPeso() * 2.0); // 2g/kg
         int fat = (int) (usuario.getPeso() * 0.8); // 0.8g/kg
         int calsRestantes = objetivoCals - (pro * 4) - (fat * 9);
         int carb = calsRestantes / 4;
 
-        // 4. Guardar o actualizar la dieta del usuario
+        // 6. Guardar o actualizar la dieta del usuario
         Dieta dieta = dietaRepository.findByUsuarioId(usuario.getId()).orElse(new Dieta());
         dieta.setUsuario(usuario);
         dieta.setAltura(dto.getAltura());

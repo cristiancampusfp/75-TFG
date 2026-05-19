@@ -24,7 +24,7 @@
         }
         .navbar-brand { font-weight: bold; letter-spacing: 1px; color: #ffffff !important; }
 
-        /* Contenedor Principal (Reemplaza al bg-white) */
+        /* Contenedor Principal */
         .card-panel {
             background-color: #1C2541 !important;
             border: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -37,32 +37,6 @@
         /* Textos */
         h1, h2, h3, h4, h5, h6 { color: #ffffff; font-weight: 700; }
         .text-muted { color: #a0aec0 !important; }
-
-        /* Pestañas (Nav Tabs) */
-        .nav-tabs {
-            border-bottom: 2px solid #2A3B5C;
-            margin-bottom: 1.5rem;
-        }
-        .nav-tabs .nav-link {
-            color: #a0aec0;
-            border: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            padding: 12px 20px;
-            transition: all 0.3s ease;
-        }
-        .nav-tabs .nav-link:hover {
-            color: #ffffff;
-            background-color: rgba(58, 134, 255, 0.1);
-            border-radius: 10px 10px 0 0;
-        }
-        .nav-tabs .nav-link.active {
-            background-color: #3A86FF !important;
-            color: #ffffff !important;
-            border: none;
-            border-radius: 10px 10px 0 0;
-            box-shadow: 0 -4px 15px rgba(58, 134, 255, 0.3);
-        }
 
         /* Botones */
         .btn-primary { background-color: #3A86FF; border: none; font-weight: bold; }
@@ -85,6 +59,8 @@
         /* Badges */
         .badge.bg-secondary { background-color: #2A3B5C !important; color: #4CC9F0 !important; border: 1px solid #4CC9F0; }
         .badge.bg-info { background-color: #3A86FF !important; color: #ffffff !important; }
+        .badge.bg-admin { background-color: rgba(255, 209, 102, 0.1); color: #ffd166; border: 1px solid #ffd166; }
+        .badge.bg-user { background-color: rgba(76, 201, 240, 0.1); color: #4CC9F0; border: 1px solid #4CC9F0; }
 
         /* Inputs y Selects */
         .form-control, .form-select, textarea {
@@ -119,132 +95,47 @@
 
 <div class="container card-panel">
 
-    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="ejercicios-tab" data-bs-toggle="tab" data-bs-target="#ejercicios" type="button" role="tab">🏋️ Catálogo de Ejercicios</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">👥 Gestión de Usuarios</button>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="adminTabsContent">
-
-        <div class="tab-pane fade show active" id="ejercicios" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Catálogo de Ejercicios</h2>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearEjercicio">
-                    + Añadir Nuevo Ejercicio
-                </button>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle text-center">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Grupo Muscular</th>
-                        <th>Dificultad</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tablaEjerciciosBody">
-                    <tr><td colspan="5" class="text-center py-4 text-muted">Cargando ejercicios...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Gestión de Clientes y Staff</h2>
+            <p class="text-muted mt-1 mb-0">Control centralizado de usuarios registrados en la plataforma.</p>
         </div>
-
-        <div class="tab-pane fade" id="usuarios" role="tabpanel">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Clientes Registrados</h2>
-                <div>
-                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
-                        + Añadir Usuario
-                    </button>
-                    <button class="btn btn-success" onclick="cargarUsuarios()">
-                        🔄 Refrescar
-                    </button>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle text-center">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Nivel</th>
-                        <th>Objetivo</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tablaUsuariosBody">
-                    <tr><td colspan="6" class="text-center py-4 text-muted">Cargando usuarios...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-<div class="modal fade" id="modalCrearEjercicio" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white border-0">
-                <h5 class="modal-title fw-bold">Registrar Ejercicio</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="formCrearEjercicio">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre del Ejercicio *</label>
-                        <input type="text" id="ejNombre" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-                        <textarea id="ejDescripcion" class="form-control" rows="2"></textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Grupo Muscular *</label>
-                            <select id="ejGrupo" class="form-select" required>
-                                <option value="Pecho">Pecho</option>
-                                <option value="Espalda">Espalda</option>
-                                <option value="Pierna">Pierna</option>
-                                <option value="Brazo">Brazo</option>
-                                <option value="Core">Core</option>
-                                <option value="Cardio">Cardio</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Dificultad *</label>
-                            <select id="ejDificultad" class="form-select" required>
-                                <option value="Principiante">Principiante</option>
-                                <option value="Intermedio">Intermedio</option>
-                                <option value="Avanzado">Avanzado</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">URL del Vídeo (Opcional)</label>
-                        <input type="url" id="ejVideo" class="form-control" placeholder="https://youtube.com/...">
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 fs-5">💾 Guardar Ejercicio</button>
-                </form>
-            </div>
+        <div>
+            <button class="btn btn-primary me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+                + Añadir Usuario
+            </button>
+            <button class="btn btn-success shadow-sm" onclick="cargarUsuarios()">
+                🔄 Refrescar
+            </button>
         </div>
     </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle text-center">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Nivel</th>
+                <th>Objetivo</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaUsuariosBody">
+            <tr><td colspan="7" class="text-center py-4 text-muted">Cargando usuarios...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white border-0">
-                <h5 class="modal-title fw-bold">Registrar Nuevo Cliente</h5>
+                <h5 class="modal-title fw-bold">Registrar Nuevo Usuario</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -253,9 +144,19 @@
                         <label class="form-label">Nombre Completo *</label>
                         <input type="text" id="newUserNombre" class="form-control" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Correo Electrónico *</label>
-                        <input type="email" id="newUserEmail" class="form-control" required>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Correo Electrónico *</label>
+                            <input type="email" id="newUserEmail" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-warning fw-bold">Rol en el Sistema *</label>
+                            <select id="newUserRol" class="form-select" required>
+                                <option value="CLIENTE">Cliente (Atleta)</option>
+                                <option value="ADMIN">Administrador (Staff)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -281,7 +182,7 @@
                         <label class="form-label">Contraseña Temporal *</label>
                         <input type="text" id="newUserPassword" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold fs-5">Crear Cuenta de Usuario</button>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold fs-5">Crear Cuenta</button>
                 </form>
             </div>
         </div>
@@ -292,16 +193,32 @@
     <div class="modal-dialog">
         <div class="modal-content" style="border-color: #ffd166;">
             <div class="modal-header bg-warning text-dark border-0">
-                <h5 class="modal-title fw-bold">✏️ Editar Usuario</h5>
+                <h5 class="modal-title fw-bold">✏️ Editar Usuario (Control Total)</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="formEditarUsuario">
                     <input type="hidden" id="editUserId">
+
                     <div class="mb-3">
                         <label class="form-label">Nombre Completo</label>
                         <input type="text" id="editUserNombre" class="form-control" required>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" id="editUserEmail" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-warning fw-bold">Rol en el Sistema</label>
+                            <select id="editUserRol" class="form-select" required>
+                                <option value="CLIENTE">Cliente (Atleta)</option>
+                                <option value="ADMIN">Administrador (Staff)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Objetivo</label>
@@ -320,6 +237,13 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-warning">Forzar Nueva Contraseña</label>
+                        <input type="text" id="editUserPassword" class="form-control" placeholder="Dejar en blanco para no cambiarla">
+                        <small class="text-muted">Si escribes aquí, sobrescribirás su contraseña actual.</small>
+                    </div>
+
                     <button type="submit" class="btn btn-warning w-100 fw-bold mt-2 fs-5">💾 Actualizar Datos</button>
                 </form>
             </div>
@@ -331,91 +255,24 @@
 
 <script>
     const token = localStorage.getItem('jwtToken');
-    if(!token) {
-        window.location.href = '/login';
+    const usuarioDatosStr = localStorage.getItem('usuarioDatos');
+
+    // 1. Si no hay token, a la calle (Login)
+    if (!token) {
+        window.location.replace('/login');
     }
 
-    function cargarEjercicios() {
-        fetch('/api/ejercicios', {
-            method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + token }
-        })
-            .then(response => {
-                if(response.status === 403) {
-                    alert("No tienes permisos para ver esto.");
-                    window.location.href = '/login';
-                    throw new Error("Prohibido");
-                }
-                return response.json();
-            })
-            .then(data => {
-                const tbody = document.getElementById('tablaEjerciciosBody');
-                tbody.innerHTML = '';
-
-                if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Aún no hay ejercicios registrados.</td></tr>';
-                    return;
-                }
-
-                data.forEach(ej => {
-                    tbody.innerHTML += `
-                    <tr>
-                        <td><span class="text-muted">#${ej.id}</span></td>
-                        <td class="fw-bold text-white">${ej.nombre}</td>
-                        <td><span class="badge bg-secondary px-3 py-2">${ej.grupoMuscular}</span></td>
-                        <td>${ej.dificultad}</td>
-                        <td>
-                            <button class="btn btn-outline-danger btn-sm fw-bold" onclick="borrarEjercicio(${ej.id})">Borrar</button>
-                        </td>
-                    </tr>
-                `;
-                });
-            })
-            .catch(error => console.error("Error al cargar:", error));
-    }
-
-    document.getElementById('formCrearEjercicio').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const nuevoEjercicio = {
-            nombre: document.getElementById('ejNombre').value,
-            descripcion: document.getElementById('ejDescripcion').value,
-            grupoMuscular: document.getElementById('ejGrupo').value,
-            dificultad: document.getElementById('ejDificultad').value,
-            tipoEjercicio: "Fuerza",
-            urlVideo: document.getElementById('ejVideo').value
-        };
-
-        fetch('/api/ejercicios', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify(nuevoEjercicio)
-        })
-            .then(response => {
-                if(response.ok) {
-                    document.getElementById('formCrearEjercicio').reset();
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearEjercicio'));
-                    modal.hide();
-                    cargarEjercicios();
-                } else {
-                    alert('Error al guardar. Asegúrate de ser Administrador.');
-                }
-            });
-    });
-
-    function borrarEjercicio(id) {
-        if(confirm('¿Seguro que deseas eliminar este ejercicio permanentemente?')) {
-            fetch('/api/ejercicios/' + id, {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-                .then(response => {
-                    if(response.ok) cargarEjercicios();
-                    else alert("Error al borrar.");
-                });
+    // 2. 🛡️ BARRERA DE SEGURIDAD VIP (Front-end)
+    if (usuarioDatosStr) {
+        try {
+            const usuarioDatos = JSON.parse(usuarioDatosStr);
+            // Si el usuario no es ADMIN, lo mandamos de vuelta a su panel sin dejarle ver nada
+            if (usuarioDatos.rol !== 'ADMIN') {
+                window.location.replace('/dashboard-cliente.html');
+            }
+        } catch (e) {
+            console.error("Error validando permisos", e);
+            window.location.replace('/login');
         }
     }
 
@@ -425,6 +282,12 @@
             headers: { 'Authorization': 'Bearer ' + token }
         })
             .then(response => {
+                // 3. 🛡️ BARRERA DE SEGURIDAD DEFINITIVA (Back-end)
+                // Si el backend dice que no tienes permiso (403), te expulsa al instante
+                if (response.status === 403) {
+                    window.location.replace('/dashboard-cliente.html');
+                    throw new Error("Acceso denegado");
+                }
                 if(!response.ok) throw new Error("Error al cargar usuarios");
                 return response.json();
             })
@@ -433,19 +296,24 @@
                 tbody.innerHTML = '';
 
                 if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No hay clientes registrados.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay clientes registrados.</td></tr>';
                     return;
                 }
 
                 data.forEach(user => {
-                    const btnEditar = `<button class="btn btn-warning btn-sm me-1 fw-bold" onclick="abrirModalEditar(${user.id}, '${user.nombre}', '${user.objetivo || ''}', '${user.nivelExperiencia || ''}')">Editar</button>`;
-                    const btnBorrar = `<button class="btn btn-outline-danger btn-sm fw-bold" onclick="borrarUsuario(${user.id})">Banear</button>`;
+                    const rolBadge = user.rol === 'ADMIN'
+                        ? `<span class="badge bg-admin px-2 py-1">ADMINISTRADOR</span>`
+                        : `<span class="badge bg-user px-2 py-1">CLIENTE</span>`;
+
+                    const btnEditar = `<button class="btn btn-warning btn-sm me-1 fw-bold" onclick="abrirModalEditar(${user.id}, '${user.nombre}', '${user.email}', '${user.rol}', '${user.objetivo || ''}', '${user.nivelExperiencia || ''}')">Editar</button>`;
+                    const btnBorrar = `<button class="btn btn-outline-danger btn-sm fw-bold" onclick="borrarUsuario(${user.id})">Eliminar</button>`;
 
                     tbody.innerHTML += `
                     <tr>
                         <td><span class="text-muted">#${user.id}</span></td>
                         <td class="fw-bold text-white">${user.nombre}</td>
                         <td class="text-primary">${user.email}</td>
+                        <td>${rolBadge}</td>
                         <td><span class="badge bg-info text-white px-2 py-1">${user.nivelExperiencia || 'N/A'}</span></td>
                         <td>${user.objetivo || 'N/A'}</td>
                         <td>${btnEditar} ${btnBorrar}</td>
@@ -463,6 +331,7 @@
             nombre: document.getElementById('newUserNombre').value,
             email: document.getElementById('newUserEmail').value,
             password: document.getElementById('newUserPassword').value,
+            rol: document.getElementById('newUserRol').value,
             objetivo: document.getElementById('newUserObjetivo').value,
             nivelExperiencia: document.getElementById('newUserNivel').value
         };
@@ -470,7 +339,8 @@
         fetch('/api/auth/register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(nuevoUsuario)
         })
@@ -494,22 +364,28 @@
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-                .then(response => {
+                .then(async response => {
                     if(response.ok) {
                         alert("Usuario eliminado correctamente.");
                         cargarUsuarios();
                     } else {
-                        alert("Error al eliminar el usuario.");
+                        const errorMsg = await response.text();
+                        alert("Error al eliminar el usuario:\n" + errorMsg + "\n\n(Aviso: Revisa el CascadeType en el backend si el error menciona Foreign Key Constraint)");
                     }
-                });
+                })
+                .catch(err => alert("Error de red: " + err));
         }
     }
 
     let modalEditarInstancia;
 
-    function abrirModalEditar(id, nombre, objetivo, nivel) {
+    function abrirModalEditar(id, nombre, email, rol, objetivo, nivel) {
         document.getElementById('editUserId').value = id;
         document.getElementById('editUserNombre').value = nombre;
+        document.getElementById('editUserEmail').value = email;
+        document.getElementById('editUserPassword').value = ""; // Se deja en blanco por seguridad
+
+        if(rol) document.getElementById('editUserRol').value = rol;
         if(objetivo) document.getElementById('editUserObjetivo').value = objetivo;
         if(nivel) document.getElementById('editUserNivel').value = nivel;
 
@@ -524,11 +400,19 @@
         e.preventDefault();
 
         const id = document.getElementById('editUserId').value;
+        const pass = document.getElementById('editUserPassword').value;
+
         const datosActualizados = {
             nombre: document.getElementById('editUserNombre').value,
+            email: document.getElementById('editUserEmail').value,
+            rol: document.getElementById('editUserRol').value,
             objetivo: document.getElementById('editUserObjetivo').value,
             nivelExperiencia: document.getElementById('editUserNivel').value
         };
+
+        if (pass.trim() !== "") {
+            datosActualizados.password = pass;
+        }
 
         fetch('/api/admin/usuarios/' + id, {
             method: 'PUT',
@@ -544,7 +428,7 @@
                     cargarUsuarios();
                     alert("Usuario actualizado con éxito.");
                 } else {
-                    alert("Error al actualizar el usuario.");
+                    alert("Error al actualizar el usuario. Revisa el backend.");
                 }
             });
     });
@@ -555,7 +439,7 @@
         window.location.href = '/login';
     }
 
-    cargarEjercicios();
+    // Inicializamos la carga de usuarios nada más abrir la página
     cargarUsuarios();
 </script>
 </body>

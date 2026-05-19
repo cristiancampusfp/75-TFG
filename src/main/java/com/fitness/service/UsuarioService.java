@@ -1,9 +1,12 @@
 package com.fitness.service;
 
 import com.fitness.dto.UsuarioDTO;
+import com.fitness.model.Rol;
 import com.fitness.model.Usuario;
+import com.fitness.repository.RolRepository;
 import com.fitness.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;       // 🔥 NUEVO: Para buscar y asignar el nuevo rol
+    private final PasswordEncoder passwordEncoder;   // 🔥 NUEVO: Para encriptar la contraseña si se cambia
 
     // 1. Método para el cliente: Obtener su propio perfil
     public UsuarioDTO obtenerPerfil(String email) {
@@ -38,15 +43,28 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    // 4. NUEVO - Método para el admin: Actualizar un usuario (UPDATE del CRUD)
+    // 4. 🔥 ACTUALIZADO - Método para el admin: Actualizar un usuario CON PODER TOTAL
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO dtoActualizado) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
 
-        // Actualizamos solo los datos de perfil (protegemos email, password y rol)
+        // 4.1 Actualización de campos básicos
         if (dtoActualizado.getNombre() != null) usuario.setNombre(dtoActualizado.getNombre());
+        if (dtoActualizado.getEmail() != null) usuario.setEmail(dtoActualizado.getEmail());
         if (dtoActualizado.getObjetivo() != null) usuario.setObjetivo(dtoActualizado.getObjetivo());
         if (dtoActualizado.getNivelExperiencia() != null) usuario.setNivelExperiencia(dtoActualizado.getNivelExperiencia());
+
+        // 4.2 Actualización de Contraseña (Solo si el admin ha escrito algo)
+        if (dtoActualizado.getPassword() != null && !dtoActualizado.getPassword().trim().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(dtoActualizado.getPassword()));
+        }
+
+        // 4.3 Actualización de Rol (Si el admin lo ha cambiado)
+        if (dtoActualizado.getRol() != null) {
+            Rol nuevoRol = rolRepository.findByNombre(dtoActualizado.getRol())
+                    .orElseThrow(() -> new RuntimeException("Error: El rol " + dtoActualizado.getRol() + " no existe en la base de datos"));
+            usuario.setRol(nuevoRol);
+        }
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         return mapearADTO(usuarioGuardado);
