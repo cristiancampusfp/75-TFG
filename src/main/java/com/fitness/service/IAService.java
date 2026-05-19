@@ -2,7 +2,7 @@ package com.fitness.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value; // Importante para leer properties
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,13 +13,14 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class IAService {
 
-    // 🟢 Leemos los valores del application.properties
     @Value("${gemini.api.url}")
     private String apiUrl;
 
     @Value("${gemini.api.key}")
     private String apiKey;
 
+    // Mantenemos el nombre pedirRutinaAGemini para no romper las llamadas desde otros servicios,
+    // pero ahora esta función es universal (sirve para Rutinas JSON y para Dietas en Texto).
     public String pedirRutinaAGemini(String promptText) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -50,23 +51,15 @@ public class IAService {
                     .getJSONObject(0)
                     .getString("text");
 
-            // 🔥 LIMPIEZA QUIRÚRGICA DEL JSON:
-            // Buscamos solo lo que esté entre el primer '{' y el último '}'
-            int primerCorchete = textoIA.indexOf("{");
-            int ultimoCorchete = textoIA.lastIndexOf("}");
+            // 🔥 HEMOS QUITADO EL CANDADO ESTRICTO DE JSON.
+            // Si es una Rutina, el RutinaService ya se encarga de extraer las llaves { }
+            // Si es una Dieta, simplemente pasará el texto limpio hacia la pantalla.
 
-            String jsonLimpio;
-            if (primerCorchete != -1 && ultimoCorchete != -1 && ultimoCorchete > primerCorchete) {
-                jsonLimpio = textoIA.substring(primerCorchete, ultimoCorchete + 1);
-            } else {
-                throw new RuntimeException("La IA no ha devuelto un formato JSON válido (faltan llaves)");
-            }
+            System.out.println("========== IA RESPONDE ==========");
+            System.out.println(textoIA);
+            System.out.println("=================================");
 
-            System.out.println("========== IA RESPONDE (Procesado) ==========");
-            System.out.println(jsonLimpio);
-            System.out.println("=============================================");
-
-            return jsonLimpio;
+            return textoIA; // Devolvemos todo directamente
 
         } catch (Exception e) {
             System.err.println("\n🚨 ================= ERROR EN COMUNICACIÓN IA ================= 🚨");
