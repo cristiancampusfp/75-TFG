@@ -82,6 +82,10 @@
         .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
         .modal-header.bg-warning { background-color: #ffd166 !important; color: #0B132B !important; border-bottom: none; }
         .modal-header.bg-warning .modal-title { color: #0B132B; }
+
+        /* 🔥 NUEVO: ESTILOS PAGINACIÓN */
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .page-info { font-weight: bold; color: #4CC9F0; }
     </style>
 </head>
 <body>
@@ -98,13 +102,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-0">Gestión de Clientes y Staff</h2>
-            <p class="text-muted mt-1 mb-0">Control centralizado de usuarios registrados en la plataforma.</p>
+            <p class="text-muted mt-1 mb-0">Control centralizado de usuarios (Paginado).</p>
         </div>
         <div>
             <button class="btn btn-primary me-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
                 + Añadir Usuario
             </button>
-            <button class="btn btn-success shadow-sm" onclick="cargarUsuarios()">
+            <button class="btn btn-success shadow-sm" onclick="cargarUsuarios(0)">
                 🔄 Refrescar
             </button>
         </div>
@@ -127,6 +131,12 @@
             <tr><td colspan="7" class="text-center py-4 text-muted">Cargando usuarios...</td></tr>
             </tbody>
         </table>
+    </div>
+
+    <div class="pagination-controls">
+        <button id="btnPrevPage" class="btn btn-outline-light btn-sm fw-bold" onclick="cambiarPagina(-1)" disabled>⬅️ Anterior</button>
+        <span id="pageInfo" class="page-info">Página 1 de 1</span>
+        <button id="btnNextPage" class="btn btn-outline-light btn-sm fw-bold" onclick="cambiarPagina(1)" disabled>Siguiente ➡️</button>
     </div>
 
 </div>
@@ -257,6 +267,10 @@
     const token = localStorage.getItem('jwtToken');
     const usuarioDatosStr = localStorage.getItem('usuarioDatos');
 
+    // Variables de control de Paginación
+    let paginaActual = 0;
+    let totalPaginas = 1;
+
     // 1. Si no hay token, a la calle (Login)
     if (!token) {
         window.location.replace('/login');
@@ -266,7 +280,6 @@
     if (usuarioDatosStr) {
         try {
             const usuarioDatos = JSON.parse(usuarioDatosStr);
-            // Si el usuario no es ADMIN, lo mandamos de vuelta a su panel sin dejarle ver nada
             if (usuarioDatos.rol !== 'ADMIN') {
                 window.location.replace('/dashboard-cliente.html');
             }
@@ -276,31 +289,43 @@
         }
     }
 
-    function cargarUsuarios() {
-        fetch('/api/admin/usuarios', {
+    // 🔥 NUEVO: Función de Carga Paginada
+    function cargarUsuarios(paginaRequerida = 0) {
+        // Añadimos el parámetro ?page=X a la URL para decírselo al Backend
+        fetch(`/api/admin/usuarios?page=${paginaRequerida}&size=10`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token }
         })
             .then(response => {
-                // 3. 🛡️ BARRERA DE SEGURIDAD DEFINITIVA (Back-end)
-                // Si el backend dice que no tienes permiso (403), te expulsa al instante
                 if (response.status === 403) {
                     window.location.replace('/dashboard-cliente.html');
                     throw new Error("Acceso denegado");
                 }
                 if(!response.ok) throw new Error("Error al cargar usuarios");
-                return response.json();
+                return response.json(); // Ahora esto devuelve un objeto Page
             })
-            .then(data => {
+            .then(pageData => {
                 const tbody = document.getElementById('tablaUsuariosBody');
                 tbody.innerHTML = '';
 
-                if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay clientes registrados.</td></tr>';
+                // Extraemos la lista de usuarios del objeto Page ('content')
+                const usuarios = pageData.content;
+
+                // Actualizamos variables de control
+                paginaActual = pageData.number;
+                totalPaginas = pageData.totalPages;
+
+                // Actualizamos la interfaz de los botones
+                document.getElementById('pageInfo').innerText = `Página ${paginaActual + 1} de ${totalPaginas === 0 ? 1 : totalPaginas}`;
+                document.getElementById('btnPrevPage').disabled = pageData.first; // Desactivar si es la primera
+                document.getElementById('btnNextPage').disabled = pageData.last;  // Desactivar si es la última
+
+                if(usuarios.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay clientes registrados en esta página.</td></tr>';
                     return;
                 }
 
-                data.forEach(user => {
+                usuarios.forEach(user => {
                     const rolBadge = user.rol === 'ADMIN'
                         ? `<span class="badge bg-admin px-2 py-1">ADMINISTRADOR</span>`
                         : `<span class="badge bg-user px-2 py-1">CLIENTE</span>`;
@@ -322,6 +347,14 @@
                 });
             })
             .catch(error => console.error("Error:", error));
+    }
+
+    // 🔥 NUEVO: Función para moverse entre páginas
+    function cambiarPagina(direccion) {
+        const nuevaPagina = paginaActual + direccion;
+        if (nuevaPagina >= 0 && nuevaPagina < totalPaginas) {
+            cargarUsuarios(nuevaPagina);
+        }
     }
 
     document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
@@ -349,7 +382,7 @@
                     document.getElementById('formCrearUsuario').reset();
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
                     modal.hide();
-                    cargarUsuarios();
+                    cargarUsuarios(paginaActual); // Recargar la página actual
                     alert("Usuario creado con éxito.");
                 } else {
                     response.text().then(text => alert("Error al crear usuario: " + text));
@@ -367,10 +400,10 @@
                 .then(async response => {
                     if(response.ok) {
                         alert("Usuario eliminado correctamente.");
-                        cargarUsuarios();
+                        cargarUsuarios(paginaActual); // Recargar la página actual
                     } else {
                         const errorMsg = await response.text();
-                        alert("Error al eliminar el usuario:\n" + errorMsg + "\n\n(Aviso: Revisa el CascadeType en el backend si el error menciona Foreign Key Constraint)");
+                        alert("Error al eliminar el usuario:\n" + errorMsg);
                     }
                 })
                 .catch(err => alert("Error de red: " + err));
@@ -383,7 +416,7 @@
         document.getElementById('editUserId').value = id;
         document.getElementById('editUserNombre').value = nombre;
         document.getElementById('editUserEmail').value = email;
-        document.getElementById('editUserPassword').value = ""; // Se deja en blanco por seguridad
+        document.getElementById('editUserPassword').value = "";
 
         if(rol) document.getElementById('editUserRol').value = rol;
         if(objetivo) document.getElementById('editUserObjetivo').value = objetivo;
@@ -425,7 +458,7 @@
             .then(response => {
                 if(response.ok) {
                     modalEditarInstancia.hide();
-                    cargarUsuarios();
+                    cargarUsuarios(paginaActual); // Recargar la página actual
                     alert("Usuario actualizado con éxito.");
                 } else {
                     alert("Error al actualizar el usuario. Revisa el backend.");
@@ -439,8 +472,8 @@
         window.location.href = '/login';
     }
 
-    // Inicializamos la carga de usuarios nada más abrir la página
-    cargarUsuarios();
+    // Inicializamos la carga de la PÁGINA 0 nada más abrir
+    cargarUsuarios(0);
 </script>
 </body>
 </html>

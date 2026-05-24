@@ -3,12 +3,13 @@ package com.fitness.controller;
 import com.fitness.dto.UsuarioDTO;
 import com.fitness.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api") // Rutas genéricas para separar cliente y admin
@@ -29,12 +30,15 @@ public class UserController {
     // ZONA DE ADMINISTRADOR (Blindaje de Seguridad)
     // ==========================================
 
-    // 2. Endpoint para el Admin: Ver todos los usuarios (READ)
+    // 2. Endpoint para el Admin: Ver todos los usuarios paginados (READ)
     @PreAuthorize("hasAuthority('ADMIN')") // <-- Bloquea a cualquiera que no sea ADMIN
     @GetMapping("/admin/usuarios")
-    public ResponseEntity<List<UsuarioDTO>> obtenerTodos() {
-        List<UsuarioDTO> usuarios = usuarioService.obtenerTodosLosUsuarios();
-        return ResponseEntity.ok(usuarios);
+    public ResponseEntity<Page<UsuarioDTO>> obtenerTodos(
+            @PageableDefault(size = 10, page = 0) Pageable pageable) { // Por defecto 10 usuarios por página
+
+        // Ahora le pasamos el objeto pageable al servicio
+        Page<UsuarioDTO> usuariosPaginados = usuarioService.obtenerTodosLosUsuarios(pageable);
+        return ResponseEntity.ok(usuariosPaginados);
     }
 
     // 3. Endpoint para el Admin: Borrar un usuario por ID (DELETE)

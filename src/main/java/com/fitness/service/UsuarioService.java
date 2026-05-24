@@ -6,6 +6,8 @@ import com.fitness.model.Usuario;
 import com.fitness.repository.RolRepository;
 import com.fitness.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,8 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;       // 🔥 NUEVO: Para buscar y asignar el nuevo rol
-    private final PasswordEncoder passwordEncoder;   // 🔥 NUEVO: Para encriptar la contraseña si se cambia
+    private final RolRepository rolRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 1. Método para el cliente: Obtener su propio perfil
     public UsuarioDTO obtenerPerfil(String email) {
@@ -28,11 +30,12 @@ public class UsuarioService {
         return mapearADTO(usuario);
     }
 
-    // 2. Método para el admin: Obtener la lista de todos los usuarios (READ del CRUD)
-    public List<UsuarioDTO> obtenerTodosLosUsuarios() {
-        return usuarioRepository.findAll().stream()
-                .map(this::mapearADTO)
-                .collect(Collectors.toList());
+    // 2. 🔥 ACTUALIZADO - Método para el admin: Obtener usuarios PAGINADOS
+    public Page<UsuarioDTO> obtenerTodosLosUsuarios(Pageable pageable) {
+        // Al pasarle 'pageable' al findAll, Spring recorta la consulta SQL automáticamente
+        // y el método .map() convierte la página de Usuarios a página de UsuarioDTOs
+        return usuarioRepository.findAll(pageable)
+                .map(this::mapearADTO);
     }
 
     // 3. Método para el admin: Eliminar un usuario por su ID (DELETE del CRUD)
@@ -43,7 +46,7 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    // 4. 🔥 ACTUALIZADO - Método para el admin: Actualizar un usuario CON PODER TOTAL
+    // 4. Método para el admin: Actualizar un usuario CON PODER TOTAL
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO dtoActualizado) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
