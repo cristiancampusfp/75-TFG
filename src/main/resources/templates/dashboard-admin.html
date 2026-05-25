@@ -73,7 +73,7 @@
             box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25) !important;
         }
         .form-select option { background-color: #0B132B; color: #ffffff; }
-        .form-label { color: #a0aec0; font-weight: 500; }
+        .form-label { color: #a0aec0; font-weight: 500; font-size: 0.9rem; }
 
         /* Modales */
         .modal-content { background-color: #1C2541; border: 1px solid #3A86FF; color: #ffffff; border-radius: 15px; }
@@ -83,7 +83,7 @@
         .modal-header.bg-warning { background-color: #ffd166 !important; color: #0B132B !important; border-bottom: none; }
         .modal-header.bg-warning .modal-title { color: #0B132B; }
 
-        /* 🔥 NUEVO: ESTILOS PAGINACIÓN */
+        /* ESTILOS PAGINACIÓN */
         .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
         .page-info { font-weight: bold; color: #4CC9F0; }
     </style>
@@ -142,7 +142,7 @@
 </div>
 
 <div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white border-0">
                 <h5 class="modal-title fw-bold">Registrar Nuevo Usuario</h5>
@@ -150,22 +150,43 @@
             </div>
             <div class="modal-body p-4">
                 <form id="formCrearUsuario">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre Completo *</label>
-                        <input type="text" id="newUserNombre" class="form-control" required>
-                    </div>
-
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre Completo *</label>
+                            <input type="text" id="newUserNombre" class="form-control" required>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Correo Electrónico *</label>
                             <input type="email" id="newUserEmail" class="form-control" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-warning fw-bold">Rol en el Sistema *</label>
-                            <select id="newUserRol" class="form-select" required>
-                                <option value="CLIENTE">Cliente (Atleta)</option>
-                                <option value="ADMIN">Administrador (Staff)</option>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Edad * (Mín: 14)</label>
+                            <input type="number" id="newUserEdad" class="form-control" min="14" max="100" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Sexo *</label>
+                            <select id="newUserSexo" class="form-select" required>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
                             </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Días Disponibles * (1-7)</label>
+                            <input type="number" id="newUserDias" class="form-control" min="1" max="7" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Altura (en metros, ej: 1.75) *</label>
+                            <input type="number" step="0.01" id="newUserAltura" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Peso (en kg, ej: 75.5) *</label>
+                            <input type="number" step="0.1" id="newUserPeso" class="form-control" required>
                         </div>
                     </div>
 
@@ -179,7 +200,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Nivel *</label>
+                            <label class="form-label">Nivel de Experiencia *</label>
                             <select id="newUserNivel" class="form-select" required>
                                 <option value="Principiante">Principiante</option>
                                 <option value="Intermedio">Intermedio</option>
@@ -188,11 +209,21 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label">Contraseña Temporal *</label>
-                        <input type="text" id="newUserPassword" class="form-control" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-warning fw-bold">Rol en el Sistema *</label>
+                            <select id="newUserRol" class="form-select" required>
+                                <option value="CLIENTE">Cliente (Atleta)</option>
+                                <option value="ADMIN">Administrador (Staff)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label text-warning fw-bold">Contraseña Temporal *</label>
+                            <input type="text" id="newUserPassword" class="form-control" minlength="6" required>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold fs-5">Crear Cuenta</button>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold fs-5 mt-2">Crear Cuenta</button>
                 </form>
             </div>
         </div>
@@ -200,7 +231,7 @@
 </div>
 
 <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content" style="border-color: #ffd166;">
             <div class="modal-header bg-warning text-dark border-0">
                 <h5 class="modal-title fw-bold">✏️ Editar Usuario (Control Total)</h5>
@@ -210,37 +241,58 @@
                 <form id="formEditarUsuario">
                     <input type="hidden" id="editUserId">
 
-                    <div class="mb-3">
-                        <label class="form-label">Nombre Completo</label>
-                        <input type="text" id="editUserNombre" class="form-control" required>
-                    </div>
-
                     <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre Completo</label>
+                            <input type="text" id="editUserNombre" class="form-control" required>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Correo Electrónico</label>
                             <input type="email" id="editUserEmail" class="form-control" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-warning fw-bold">Rol en el Sistema</label>
-                            <select id="editUserRol" class="form-select" required>
-                                <option value="CLIENTE">Cliente (Atleta)</option>
-                                <option value="ADMIN">Administrador (Staff)</option>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Edad</label>
+                            <input type="number" id="editUserEdad" class="form-control" min="14" max="100" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Sexo</label>
+                            <select id="editUserSexo" class="form-select" required>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
                             </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Días Disponibles</label>
+                            <input type="number" id="editUserDias" class="form-control" min="1" max="7" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Altura (m)</label>
+                            <input type="number" step="0.01" id="editUserAltura" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Peso (kg)</label>
+                            <input type="number" step="0.1" id="editUserPeso" class="form-control" required>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Objetivo</label>
-                            <select id="editUserObjetivo" class="form-select">
+                            <select id="editUserObjetivo" class="form-select" required>
                                 <option value="Perder Peso">Perder Peso</option>
                                 <option value="Ganar Masa Muscular">Ganar Masa Muscular</option>
                                 <option value="Mantenimiento">Mantenimiento</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Nivel</label>
-                            <select id="editUserNivel" class="form-select">
+                            <label class="form-label">Nivel de Experiencia</label>
+                            <select id="editUserNivel" class="form-select" required>
                                 <option value="Principiante">Principiante</option>
                                 <option value="Intermedio">Intermedio</option>
                                 <option value="Avanzado">Avanzado</option>
@@ -248,13 +300,21 @@
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-warning">Forzar Nueva Contraseña</label>
-                        <input type="text" id="editUserPassword" class="form-control" placeholder="Dejar en blanco para no cambiarla">
-                        <small class="text-muted">Si escribes aquí, sobrescribirás su contraseña actual.</small>
+                    <div class="row align-items-end">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-dark fw-bold">Rol en el Sistema</label>
+                            <select id="editUserRol" class="form-select border-warning" required>
+                                <option value="CLIENTE">Cliente (Atleta)</option>
+                                <option value="ADMIN">Administrador (Staff)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-dark fw-bold">Forzar Nueva Contraseña</label>
+                            <input type="text" id="editUserPassword" class="form-control border-warning" placeholder="Dejar blanco si no cambia" minlength="6">
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-warning w-100 fw-bold mt-2 fs-5">💾 Actualizar Datos</button>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold mt-3 fs-5">💾 Actualizar Datos</button>
                 </form>
             </div>
         </div>
@@ -267,16 +327,13 @@
     const token = localStorage.getItem('jwtToken');
     const usuarioDatosStr = localStorage.getItem('usuarioDatos');
 
-    // Variables de control de Paginación
     let paginaActual = 0;
     let totalPaginas = 1;
 
-    // 1. Si no hay token, a la calle (Login)
     if (!token) {
         window.location.replace('/login');
     }
 
-    // 2. 🛡️ BARRERA DE SEGURIDAD VIP (Front-end)
     if (usuarioDatosStr) {
         try {
             const usuarioDatos = JSON.parse(usuarioDatosStr);
@@ -284,14 +341,11 @@
                 window.location.replace('/dashboard-cliente.html');
             }
         } catch (e) {
-            console.error("Error validando permisos", e);
             window.location.replace('/login');
         }
     }
 
-    // 🔥 NUEVO: Función de Carga Paginada
     function cargarUsuarios(paginaRequerida = 0) {
-        // Añadimos el parámetro ?page=X a la URL para decírselo al Backend
         fetch(`/api/admin/usuarios?page=${paginaRequerida}&size=10`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + token }
@@ -302,54 +356,56 @@
                     throw new Error("Acceso denegado");
                 }
                 if(!response.ok) throw new Error("Error al cargar usuarios");
-                return response.json(); // Ahora esto devuelve un objeto Page
+                return response.json();
             })
             .then(pageData => {
                 const tbody = document.getElementById('tablaUsuariosBody');
                 tbody.innerHTML = '';
 
-                // Extraemos la lista de usuarios del objeto Page ('content')
                 const usuarios = pageData.content;
-
-                // Actualizamos variables de control
                 paginaActual = pageData.number;
                 totalPaginas = pageData.totalPages;
 
-                // Actualizamos la interfaz de los botones
                 document.getElementById('pageInfo').innerText = `Página ${paginaActual + 1} de ${totalPaginas === 0 ? 1 : totalPaginas}`;
-                document.getElementById('btnPrevPage').disabled = pageData.first; // Desactivar si es la primera
-                document.getElementById('btnNextPage').disabled = pageData.last;  // Desactivar si es la última
+                document.getElementById('btnPrevPage').disabled = pageData.first;
+                document.getElementById('btnNextPage').disabled = pageData.last;
 
                 if(usuarios.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay clientes registrados en esta página.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay clientes registrados.</td></tr>';
                     return;
                 }
 
                 usuarios.forEach(user => {
-                    const rolBadge = user.rol === 'ADMIN'
+                    let rolName = 'CLIENTE';
+                    if (user.rol) {
+                        rolName = typeof user.rol === 'object' ? user.rol.nombre : user.rol;
+                    }
+
+                    const rolBadge = rolName === 'ADMIN'
                         ? `<span class="badge bg-admin px-2 py-1">ADMINISTRADOR</span>`
                         : `<span class="badge bg-user px-2 py-1">CLIENTE</span>`;
 
-                    const btnEditar = `<button class="btn btn-warning btn-sm me-1 fw-bold" onclick="abrirModalEditar(${user.id}, '${user.nombre}', '${user.email}', '${user.rol}', '${user.objetivo || ''}', '${user.nivelExperiencia || ''}')">Editar</button>`;
+                    const userJson = encodeURIComponent(JSON.stringify(user));
+
+                    const btnEditar = `<button class="btn btn-warning btn-sm me-1 fw-bold" onclick="abrirModalEditar('${userJson}')">Editar</button>`;
                     const btnBorrar = `<button class="btn btn-outline-danger btn-sm fw-bold" onclick="borrarUsuario(${user.id})">Eliminar</button>`;
 
                     tbody.innerHTML += `
-                    <tr>
-                        <td><span class="text-muted">#${user.id}</span></td>
-                        <td class="fw-bold text-white">${user.nombre}</td>
-                        <td class="text-primary">${user.email}</td>
-                        <td>${rolBadge}</td>
-                        <td><span class="badge bg-info text-white px-2 py-1">${user.nivelExperiencia || 'N/A'}</span></td>
-                        <td>${user.objetivo || 'N/A'}</td>
-                        <td>${btnEditar} ${btnBorrar}</td>
-                    </tr>
-                `;
+                <tr>
+                    <td><span class="text-muted">#${user.id}</span></td>
+                    <td class="fw-bold text-white">${user.nombre}</td>
+                    <td class="text-primary">${user.email}</td>
+                    <td>${rolBadge}</td>
+                    <td><span class="badge bg-info text-white px-2 py-1">${user.nivelExperiencia || 'N/A'}</span></td>
+                    <td>${user.objetivo || 'N/A'}</td>
+                    <td>${btnEditar} ${btnBorrar}</td>
+                </tr>
+            `;
                 });
             })
             .catch(error => console.error("Error:", error));
     }
 
-    // 🔥 NUEVO: Función para moverse entre páginas
     function cambiarPagina(direccion) {
         const nuevaPagina = paginaActual + direccion;
         if (nuevaPagina >= 0 && nuevaPagina < totalPaginas) {
@@ -357,6 +413,9 @@
         }
     }
 
+    // ==========================================
+    // LÓGICA DE REGISTRO
+    // ==========================================
     document.getElementById('formCrearUsuario').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -366,7 +425,12 @@
             password: document.getElementById('newUserPassword').value,
             rol: document.getElementById('newUserRol').value,
             objetivo: document.getElementById('newUserObjetivo').value,
-            nivelExperiencia: document.getElementById('newUserNivel').value
+            nivelExperiencia: document.getElementById('newUserNivel').value,
+            edad: parseInt(document.getElementById('newUserEdad').value),
+            peso: parseFloat(document.getElementById('newUserPeso').value),
+            altura: parseFloat(document.getElementById('newUserAltura').value),
+            sexo: document.getElementById('newUserSexo').value,
+            diasDisponibles: parseInt(document.getElementById('newUserDias').value)
         };
 
         fetch('/api/auth/register', {
@@ -377,22 +441,23 @@
             },
             body: JSON.stringify(nuevoUsuario)
         })
-            .then(response => {
+            .then(async response => {
                 if(response.ok) {
                     document.getElementById('formCrearUsuario').reset();
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
                     modal.hide();
-                    cargarUsuarios(paginaActual); // Recargar la página actual
-                    alert("Usuario creado con éxito.");
+                    cargarUsuarios(paginaActual);
+                    alert("✅ Usuario creado con éxito.");
                 } else {
-                    response.text().then(text => alert("Error al crear usuario: " + text));
+                    const text = await response.text();
+                    alert("❌ Error al crear usuario:\n" + text);
                 }
             })
             .catch(error => console.error("Error:", error));
     });
 
     function borrarUsuario(id) {
-        if(confirm('⚠️ ¡Atención! ¿Estás seguro de que deseas eliminar a este usuario de la base de datos? Esto borrará también sus rutinas.')) {
+        if(confirm('⚠️ ¡Atención! ¿Estás seguro de que deseas eliminar a este usuario?')) {
             fetch('/api/admin/usuarios/' + id, {
                 method: 'DELETE',
                 headers: { 'Authorization': 'Bearer ' + token }
@@ -400,7 +465,7 @@
                 .then(async response => {
                     if(response.ok) {
                         alert("Usuario eliminado correctamente.");
-                        cargarUsuarios(paginaActual); // Recargar la página actual
+                        cargarUsuarios(paginaActual);
                     } else {
                         const errorMsg = await response.text();
                         alert("Error al eliminar el usuario:\n" + errorMsg);
@@ -412,15 +477,31 @@
 
     let modalEditarInstancia;
 
-    function abrirModalEditar(id, nombre, email, rol, objetivo, nivel) {
-        document.getElementById('editUserId').value = id;
-        document.getElementById('editUserNombre').value = nombre;
-        document.getElementById('editUserEmail').value = email;
+    // ==========================================
+    // LÓGICA DE EDICIÓN
+    // ==========================================
+    function abrirModalEditar(userEncoded) {
+        const user = JSON.parse(decodeURIComponent(userEncoded));
+
+        document.getElementById('editUserId').value = user.id;
+        document.getElementById('editUserNombre').value = user.nombre || '';
+        document.getElementById('editUserEmail').value = user.email || '';
         document.getElementById('editUserPassword').value = "";
 
-        if(rol) document.getElementById('editUserRol').value = rol;
-        if(objetivo) document.getElementById('editUserObjetivo').value = objetivo;
-        if(nivel) document.getElementById('editUserNivel').value = nivel;
+        document.getElementById('editUserEdad').value = user.edad || 18;
+        document.getElementById('editUserPeso').value = user.peso || 70;
+        document.getElementById('editUserAltura').value = user.altura || 1.70;
+        document.getElementById('editUserSexo').value = user.sexo || 'Hombre';
+        document.getElementById('editUserDias').value = user.diasDisponibles || 3;
+
+        let rolStr = 'CLIENTE';
+        if (user.rol) {
+            rolStr = typeof user.rol === 'object' ? user.rol.nombre : user.rol;
+        }
+        document.getElementById('editUserRol').value = rolStr;
+
+        if(user.objetivo) document.getElementById('editUserObjetivo').value = user.objetivo;
+        if(user.nivelExperiencia) document.getElementById('editUserNivel').value = user.nivelExperiencia;
 
         const modalElement = document.getElementById('modalEditarUsuario');
         if (!modalEditarInstancia) {
@@ -440,7 +521,12 @@
             email: document.getElementById('editUserEmail').value,
             rol: document.getElementById('editUserRol').value,
             objetivo: document.getElementById('editUserObjetivo').value,
-            nivelExperiencia: document.getElementById('editUserNivel').value
+            nivelExperiencia: document.getElementById('editUserNivel').value,
+            edad: parseInt(document.getElementById('editUserEdad').value),
+            peso: parseFloat(document.getElementById('editUserPeso').value),
+            altura: parseFloat(document.getElementById('editUserAltura').value),
+            sexo: document.getElementById('editUserSexo').value,
+            diasDisponibles: parseInt(document.getElementById('editUserDias').value)
         };
 
         if (pass.trim() !== "") {
@@ -455,15 +541,17 @@
             },
             body: JSON.stringify(datosActualizados)
         })
-            .then(response => {
+            .then(async response => {
                 if(response.ok) {
                     modalEditarInstancia.hide();
-                    cargarUsuarios(paginaActual); // Recargar la página actual
-                    alert("Usuario actualizado con éxito.");
+                    cargarUsuarios(paginaActual);
+                    alert("✅ Usuario actualizado con éxito.");
                 } else {
-                    alert("Error al actualizar el usuario. Revisa el backend.");
+                    const errorBackend = await response.text();
+                    alert("❌ Fallo del Backend al editar:\n\n" + errorBackend);
                 }
-            });
+            })
+            .catch(err => alert("Error crítico de conexión: " + err));
     });
 
     function cerrarSesion() {
@@ -472,7 +560,6 @@
         window.location.href = '/login';
     }
 
-    // Inicializamos la carga de la PÁGINA 0 nada más abrir
     cargarUsuarios(0);
 </script>
 </body>

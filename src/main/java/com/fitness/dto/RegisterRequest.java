@@ -39,6 +39,7 @@ public class RegisterRequest {
     @NotBlank(message = "El nivel de experiencia es obligatorio")
     private String nivelExperiencia;
 
+    private String rol;
     @NotNull(message = "Los días disponibles son obligatorios")
     @Min(value = 1, message = "Debes tener al menos 1 día disponible")
     @Max(value = 7, message = "El máximo son 7 días a la semana")

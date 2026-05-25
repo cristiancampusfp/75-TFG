@@ -30,15 +30,13 @@ public class UsuarioService {
         return mapearADTO(usuario);
     }
 
-    // 2. 🔥 ACTUALIZADO - Método para el admin: Obtener usuarios PAGINADOS
+    // 2. Método para el admin: Obtener usuarios PAGINADOS
     public Page<UsuarioDTO> obtenerTodosLosUsuarios(Pageable pageable) {
-        // Al pasarle 'pageable' al findAll, Spring recorta la consulta SQL automáticamente
-        // y el método .map() convierte la página de Usuarios a página de UsuarioDTOs
         return usuarioRepository.findAll(pageable)
                 .map(this::mapearADTO);
     }
 
-    // 3. Método para el admin: Eliminar un usuario por su ID (DELETE del CRUD)
+    // 3. Método para el admin: Eliminar un usuario por su ID
     public void eliminarUsuario(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new RuntimeException("Usuario no encontrado con ID: " + id);
@@ -57,15 +55,22 @@ public class UsuarioService {
         if (dtoActualizado.getObjetivo() != null) usuario.setObjetivo(dtoActualizado.getObjetivo());
         if (dtoActualizado.getNivelExperiencia() != null) usuario.setNivelExperiencia(dtoActualizado.getNivelExperiencia());
 
-        // 4.2 Actualización de Contraseña (Solo si el admin ha escrito algo)
+        // 🔥 NUEVO: Actualización de datos biométricos y de configuración
+        if (dtoActualizado.getEdad() != null) usuario.setEdad(dtoActualizado.getEdad());
+        if (dtoActualizado.getPeso() != null) usuario.setPeso(dtoActualizado.getPeso());
+        if (dtoActualizado.getAltura() != null) usuario.setAltura(dtoActualizado.getAltura());
+        if (dtoActualizado.getSexo() != null) usuario.setSexo(dtoActualizado.getSexo());
+        if (dtoActualizado.getDiasDisponibles() != null) usuario.setDiasDisponibles(dtoActualizado.getDiasDisponibles());
+
+        // 4.2 Actualización de Contraseña
         if (dtoActualizado.getPassword() != null && !dtoActualizado.getPassword().trim().isEmpty()) {
             usuario.setPassword(passwordEncoder.encode(dtoActualizado.getPassword()));
         }
 
-        // 4.3 Actualización de Rol (Si el admin lo ha cambiado)
+        // 4.3 Actualización de Rol
         if (dtoActualizado.getRol() != null) {
             Rol nuevoRol = rolRepository.findByNombre(dtoActualizado.getRol())
-                    .orElseThrow(() -> new RuntimeException("Error: El rol " + dtoActualizado.getRol() + " no existe en la base de datos"));
+                    .orElseThrow(() -> new RuntimeException("Error: El rol " + dtoActualizado.getRol() + " no existe en la BD"));
             usuario.setRol(nuevoRol);
         }
 
@@ -87,6 +92,13 @@ public class UsuarioService {
         dto.setObjetivo(usuario.getObjetivo());
         dto.setNivelExperiencia(usuario.getNivelExperiencia());
         dto.setTipoSuscripcion(usuario.getTipoSuscripcion());
+
+        // 🔥 NUEVO: Empaquetar datos biométricos para mandarlos al Frontend
+        dto.setEdad(usuario.getEdad());
+        dto.setPeso(usuario.getPeso());
+        dto.setAltura(usuario.getAltura());
+        dto.setSexo(usuario.getSexo());
+        dto.setDiasDisponibles(usuario.getDiasDisponibles());
 
         return dto;
     }

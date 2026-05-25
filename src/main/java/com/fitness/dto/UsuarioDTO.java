@@ -12,4 +12,9 @@ public class UsuarioDTO {
     private String objetivo;
     private String nivelExperiencia;
     private String tipoSuscripcion;
+    private Integer edad;
+    private Double peso;
+    private Double altura;
+    private String sexo;
+    private Integer diasDisponibles;
 }
