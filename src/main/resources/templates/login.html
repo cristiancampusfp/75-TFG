@@ -5,69 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - FitnessApp PRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         /* ==========================================
-           TEMA PREMIUM: MIDNIGHT BLUE
+           TEMA PREMIUM: MIDNIGHT BLUE - LOGIN
            ========================================== */
         body {
-            /* Fondo degradado oscuro elegante */
             background: linear-gradient(135deg, #0B132B 0%, #040711 100%);
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
+
+        /* Efecto de fondo decorativo */
+        .bg-shapes {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: -1;
+        }
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            border-radius: 50%;
+        }
+        .shape-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #3A86FF; }
+        .shape-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #06d6a0; opacity: 0.15; }
 
         /* Tarjeta de Login */
         .card-login {
             width: 100%;
             max-width: 420px;
-            background-color: #1C2541; /* Azul marino profundo */
-            border: 1px solid rgba(255, 255, 255, 0.05); /* Borde sutil */
+            background-color: rgba(28, 37, 65, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             padding: 2.5rem !important;
-            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
 
-        /* Título */
-        .card-login h2 {
-            font-weight: 700;
-            letter-spacing: 1px;
+        /* Branding */
+        .brand-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
             color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
         }
+        .brand-icon { color: #4CC9F0; }
+        .brand-tagline { color: #06d6a0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
         /* Textos y Labels */
         .form-label {
-            color: #a0aec0; /* Gris azulado claro */
-            font-weight: 500;
-            font-size: 0.9rem;
+            color: #a0aec0;
+            font-weight: 600;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Inputs (Cajas de texto) */
-        .form-control {
-            background-color: #0B132B; /* Fondo oscuro */
-            border: 1px solid #2A3B5C;
-            color: #ffffff;
-            border-radius: 10px;
+        /* Inputs con Iconos */
+        .input-group-text, .form-control {
+            background-color: #0B132B !important;
+            border: 1px solid #2A3B5C !important;
+            color: #ffffff !important;
             padding: 12px 15px;
             transition: all 0.3s ease;
         }
+        .input-group-text { color: #4CC9F0 !important; border-right: none !important; }
+        .form-control { border-left: none !important; border-radius: 0 10px 10px 0; }
 
-        /* Efecto al hacer clic en el Input */
+        /* Efecto Focus */
         .form-control:focus {
-            background-color: #0B132B;
-            color: #ffffff;
-            border-color: #3A86FF; /* Azul eléctrico */
-            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+            box-shadow: none !important;
+            border-color: #3A86FF !important;
+        }
+        .input-group:focus-within .input-group-text, .input-group:focus-within .form-control {
+            border-color: #3A86FF !important;
         }
 
-        /* Parche para el autocompletado de Chrome (que no se ponga blanco) */
+        /* Parche autocompletado de Chrome */
         input:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 30px #0B132B inset !important;
             -webkit-text-fill-color: white !important;
@@ -75,7 +99,7 @@
 
         /* Botón Principal */
         .btn-primary {
-            background-color: #3A86FF; /* Azul eléctrico vibrante */
+            background-color: #3A86FF;
             border: none;
             border-radius: 10px;
             padding: 12px;
@@ -84,10 +108,8 @@
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
-
-        /* Efecto Hover del Botón */
         .btn-primary:hover {
-            background-color: #4CC9F0; /* Cian brillante */
+            background-color: #4CC9F0;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
         }
@@ -96,43 +118,91 @@
         .text-decoration-none {
             color: #4CC9F0;
             font-size: 0.95rem;
+            font-weight: 500;
             transition: color 0.3s;
         }
         .text-decoration-none:hover {
             color: #ffffff;
         }
+
+        /* Footer Corporativo */
+        .copyright {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 30px;
+            line-height: 1.5;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
     </style>
 </head>
 <body>
 
+<div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+</div>
+
 <div class="container d-flex justify-content-center">
     <div class="card card-login">
-        <h2 class="text-center mb-4">⚡ Iniciar Sesión</h2>
 
-        <div id="alerta" class="alert d-none fw-bold text-center" role="alert"></div>
+        <div class="text-center mb-4">
+            <div class="brand-logo"><span class="brand-icon">⚡</span> Fitness PRO</div>
+            <div class="brand-tagline">Inteligencia Artificial Deportiva</div>
+        </div>
+
+        <h5 class="text-center mb-4 fw-bold" style="color: #e2e8f0;">Iniciar Sesión</h5>
+
+        <div id="alerta" class="alert d-none fw-bold text-center small py-2" role="alert"></div>
 
         <form id="loginForm">
             <div class="mb-3">
                 <label class="form-label">Correo Electrónico</label>
-                <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                    <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                </div>
             </div>
 
             <div class="mb-4">
                 <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-4">ENTRAR</button>
+            <button type="submit" class="btn btn-primary w-100 mb-4" id="btnSubmit">ENTRAR AL PANEL</button>
+
             <div class="text-center">
                 <a href="/register" class="text-decoration-none">¿No tienes cuenta? Regístrate aquí</a>
             </div>
         </form>
+
+        <div class="text-center copyright">
+            &copy; 2026 Fitness PRO<br>
+        </div>
+
     </div>
 </div>
 
 <script>
+    // Si el usuario ya está logueado, redirigimos directamente
+    if(localStorage.getItem('jwtToken')) {
+        const userData = JSON.parse(localStorage.getItem('usuarioDatos') || '{}');
+        if (userData.rol === 'ADMIN') {
+            window.location.href = '/dashboard-admin';
+        } else {
+            window.location.href = '/dashboard-cliente';
+        }
+    }
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        const btn = document.getElementById('btnSubmit');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Conectando...';
+        btn.disabled = true;
 
         const datos = {
             email: document.getElementById('email').value,
@@ -159,7 +229,7 @@
                 localStorage.setItem('jwtToken', data.token);
                 localStorage.setItem('usuarioDatos', JSON.stringify(data.usuario));
 
-                alerta.className = 'alert alert-success mt-3';
+                alerta.className = 'alert alert-success mt-3 small py-2';
                 alerta.textContent = '¡Bienvenido ' + data.usuario.nombre + '! Accediendo...';
                 alerta.classList.remove('d-none');
 
@@ -172,9 +242,12 @@
                 }, 1500);
             })
             .catch(error => {
-                alerta.className = 'alert alert-danger mt-3';
+                alerta.className = 'alert alert-danger mt-3 small py-2';
                 alerta.textContent = error.message || 'Credenciales incorrectas';
                 alerta.classList.remove('d-none');
+
+                btn.innerHTML = 'ENTRAR AL PANEL';
+                btn.disabled = false;
             });
     });
 </script>

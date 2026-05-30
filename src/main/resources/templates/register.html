@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - FitnessApp PRO</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         /* ==========================================
-           TEMA PREMIUM: MIDNIGHT BLUE
+           TEMA PREMIUM: MIDNIGHT BLUE - REGISTRO
            ========================================== */
         body {
             background: linear-gradient(135deg, #0B132B 0%, #040711 100%);
@@ -18,49 +19,71 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 2rem 0; /* Padding para que no se pegue arriba y abajo en móviles */
+            padding: 3rem 0;
+            overflow-x: hidden;
         }
+
+        /* Efecto de fondo decorativo */
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: -1;
+        }
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.4;
+            border-radius: 50%;
+        }
+        .shape-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #3A86FF; }
+        .shape-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #06d6a0; opacity: 0.15; }
 
         /* Tarjeta de Registro */
         .card-registro {
             width: 100%;
-            max-width: 650px;
-            background-color: #1C2541;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 680px; /* Un poco más ancha por las columnas */
+            background-color: rgba(28, 37, 65, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             padding: 2.5rem !important;
-            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
 
-        /* Título */
-        .card-registro h2 {
-            font-weight: 700;
-            letter-spacing: 1px;
+        /* Branding */
+        .brand-logo {
+            font-size: 2.2rem;
+            font-weight: 800;
             color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
         }
+        .brand-icon { color: #06d6a0; }
+        .brand-tagline { color: #4CC9F0; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
         /* Textos y Labels */
         .form-label {
             color: #a0aec0;
-            font-weight: 500;
-            font-size: 0.85rem;
+            font-weight: 600;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
         }
 
-        /* Inputs y Selects */
-        .form-control, .form-select {
-            background-color: #0B132B;
-            border: 1px solid #2A3B5C;
-            color: #ffffff;
-            border-radius: 10px;
+        /* Inputs y Selects con Iconos */
+        .input-group-text, .form-control, .form-select {
+            background-color: #0B132B !important;
+            border: 1px solid #2A3B5C !important;
+            color: #ffffff !important;
             padding: 10px 15px;
             transition: all 0.3s ease;
         }
+        .input-group-text { color: #06d6a0 !important; border-right: none !important; }
+        .form-control, .form-select { border-left: none !important; }
 
-        /* Arreglar el color de las opciones del select */
         .form-select option {
             background-color: #0B132B;
             color: #ffffff;
@@ -68,10 +91,11 @@
 
         /* Efecto Focus */
         .form-control:focus, .form-select:focus {
-            background-color: #0B132B;
-            color: #ffffff;
-            border-color: #3A86FF;
-            box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
+            box-shadow: none !important;
+            border-color: #06d6a0 !important;
+        }
+        .input-group:focus-within .input-group-text, .input-group:focus-within .form-control, .input-group:focus-within .form-select {
+            border-color: #06d6a0 !important;
         }
 
         /* Parche Autofill Chrome */
@@ -81,8 +105,9 @@
         }
 
         /* Botón Principal */
-        .btn-primary {
-            background-color: #3A86FF;
+        .btn-success {
+            background-color: #06d6a0;
+            color: #0B132B;
             border: none;
             border-radius: 10px;
             padding: 12px;
@@ -90,111 +115,172 @@
             font-size: 1.1rem;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 15px;
         }
-
-        .btn-primary:hover {
-            background-color: #4CC9F0;
+        .btn-success:hover {
+            background-color: #05b586;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
+            box-shadow: 0 8px 20px rgba(6, 214, 160, 0.4);
         }
 
         /* Enlaces */
         .text-decoration-none {
-            color: #4CC9F0;
+            color: #06d6a0;
             font-size: 0.95rem;
+            font-weight: 500;
             transition: color 0.3s;
         }
         .text-decoration-none:hover {
             color: #ffffff;
         }
+
+        /* Footer Corporativo */
+        .copyright {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 30px;
+            line-height: 1.5;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
     </style>
 </head>
 <body>
 
+<div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+</div>
+
 <div class="container d-flex justify-content-center">
     <div class="card card-registro">
-        <h2 class="text-center mb-4">⚡ Crea tu cuenta PRO</h2>
 
-        <div id="alerta" class="alert d-none fw-bold text-center" role="alert"></div>
+        <div class="text-center mb-4">
+            <div class="brand-logo"><span class="brand-icon">⚡</span> Fitness PRO</div>
+            <div class="brand-tagline">Creación de Perfil Biométrico</div>
+        </div>
+
+        <div id="alerta" class="alert d-none fw-bold text-center small py-2" role="alert"></div>
 
         <form id="registroForm">
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Nombre completo</label>
-                    <input type="text" class="form-control" id="nombre" placeholder="Ej: Juan Pérez" required>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" class="form-control" id="nombre" placeholder="Ej: Juan Pérez" required>
+                    </div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                        <input type="email" class="form-control" id="email" placeholder="ejemplo@correo.com" required>
+                    </div>
                 </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
                 <label class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                </div>
             </div>
+
+            <h6 class="text-muted fw-bold mb-3 border-bottom border-secondary pb-2" style="font-size: 0.85rem;"><i class="bi bi-clipboard2-pulse"></i> Datos Biométricos (Para la IA)</h6>
 
             <div class="row">
                 <div class="col-md-4 mb-3">
                     <label class="form-label">Edad</label>
-                    <input type="number" class="form-control" id="edad" placeholder="Años" required>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                        <input type="number" class="form-control" id="edad" placeholder="Años" required>
+                    </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Peso (kg)</label>
-                    <input type="number" step="0.1" class="form-control" id="peso" placeholder="Ej: 75.5" required>
+                    <label class="form-label">Peso</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-speedometer2"></i></span>
+                        <input type="number" step="0.1" class="form-control" id="peso" placeholder="Kg" required>
+                    </div>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label class="form-label">Altura (m)</label>
-                    <input type="number" step="0.01" class="form-control" id="altura" placeholder="Ej: 1.75" required>
+                    <label class="form-label">Altura</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-rulers"></i></span>
+                        <input type="number" step="0.01" class="form-control" id="altura" placeholder="Metros" required>
+                    </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Objetivo</label>
-                    <select class="form-select" id="objetivo" required>
-                        <option value="perder_peso">Perder peso</option>
-                        <option value="mantener">Mantener</option>
-                        <option value="ganar_musculo">Ganar músculo</option>
-                    </select>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-bullseye"></i></span>
+                        <select class="form-select" id="objetivo" required>
+                            <option value="perder_peso">Perder peso</option>
+                            <option value="mantener">Mantener</option>
+                            <option value="ganar_musculo">Ganar músculo</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Nivel de Experiencia</label>
-                    <select class="form-select" id="nivelExperiencia" required>
-                        <option value="principiante">Principiante</option>
-                        <option value="intermedio">Intermedio</option>
-                        <option value="avanzado">Avanzado</option>
-                    </select>
+                    <label class="form-label">Nivel Experiencia</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-bar-chart-fill"></i></span>
+                        <select class="form-select" id="nivelExperiencia" required>
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="row mb-4">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="form-label">Sexo (Metabolismo)</label>
-                    <select class="form-select" id="sexo" required>
-                        <option value="" disabled selected>Selecciona...</option>
-                        <option value="MASCULINO">Masculino</option>
-                        <option value="FEMENINO">Femenino</option>
-                    </select>
+                    <label class="form-label">Sexo</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-gender-ambiguous"></i></span>
+                        <select class="form-select" id="sexo" required>
+                            <option value="" disabled selected>Selecciona...</option>
+                            <option value="MASCULINO">Masculino</option>
+                            <option value="FEMENINO">Femenino</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Días disponibles (Semana)</label>
-                    <input type="number" class="form-control" id="diasDisponibles" min="1" max="7" placeholder="Ej: 4" required>
+                    <label class="form-label">Días/Semana</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-calendar-week"></i></span>
+                        <input type="number" class="form-control" id="diasDisponibles" min="1" max="7" placeholder="Ej: 4" required>
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-4">COMPLETAR REGISTRO</button>
+            <button type="submit" class="btn btn-success w-100 mb-4" id="btnSubmit">COMPLETAR REGISTRO PRO</button>
+
             <div class="text-center">
                 <a href="/login" class="text-decoration-none">¿Ya tienes cuenta? Inicia sesión aquí</a>
             </div>
         </form>
+
+        <div class="text-center copyright">
+            &copy; 2026 Fitness PRO.
+        </div>
+
     </div>
 </div>
 
 <script>
     document.getElementById('registroForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        const btn = document.getElementById('btnSubmit');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Creando perfil biométrico...';
+        btn.disabled = true;
 
         const datos = {
             nombre: document.getElementById('nombre').value,
@@ -220,18 +306,21 @@
         })
             .then(response => {
                 if (response.ok) {
-                    alerta.className = 'alert alert-success mt-3';
-                    alerta.textContent = '¡Registro completado! Redirigiendo...';
+                    alerta.className = 'alert alert-success mt-3 small py-2';
+                    alerta.innerHTML = '<i class="bi bi-check-circle-fill"></i> ¡Registro completado! Redirigiendo al Login...';
                     alerta.classList.remove('d-none');
-                    setTimeout(() => window.location.href = '/login', 2000);
+                    setTimeout(() => window.location.href = '/login', 2500);
                 } else {
                     return response.text().then(text => { throw new Error(text) });
                 }
             })
             .catch(error => {
-                alerta.className = 'alert alert-danger mt-3';
-                alerta.textContent = error.message || 'Error al registrar el usuario';
+                alerta.className = 'alert alert-danger mt-3 small py-2';
+                alerta.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> ' + (error.message || 'Error al registrar el usuario');
                 alerta.classList.remove('d-none');
+
+                btn.innerHTML = 'COMPLETAR REGISTRO PRO';
+                btn.disabled = false;
             });
     });
 </script>
