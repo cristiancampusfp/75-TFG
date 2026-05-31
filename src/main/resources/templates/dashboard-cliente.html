@@ -426,10 +426,10 @@
                     <h5 class="text-white fw-bold mb-1" id="perfilNombre">Cargando...</h5>
                     <span class="badge bg-user" id="perfilRol">CLIENTE</span>
                 </div>
-                <form id="formMiPerfil">
+                <form id="formMiPerfil" autocomplete="off">
                     <div class="mb-3">
                         <label class="form-label text-white">Nueva Contraseña de Acceso</label>
-                        <input type="password" id="perfilNuevaPassword" class="form-control" placeholder="Escribe tu nueva clave (Mínimo 6 caracteres)" minlength="6" required>
+                        <input type="password" id="perfilNuevaPassword" class="form-control" placeholder="Escribe tu nueva clave (Mínimo 6 caracteres)" minlength="6" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-muted small">Por seguridad, tu sesión actual se cerrará automáticamente al cambiar la clave y tendrás que volver a iniciar sesión.</label>
@@ -475,8 +475,16 @@
                 const ultimaRutina = data[data.length - 1];
 
                 const ejerciciosPorDia = {};
+
+                // 🔥 CORRECCIÓN: Usamos el orden numérico para forzar los días de la semana perfectos
+                const nombresDeDias = {
+                    1: 'Lunes', 2: 'Martes', 3: 'Miércoles',
+                    4: 'Jueves', 5: 'Viernes', 6: 'Sábado', 7: 'Domingo'
+                };
+
                 ultimaRutina.ejercicios.forEach(ej => {
-                    const dia = ej.nombreDia ? ej.nombreDia.replace(/Semana \d+ /gi, '').trim() : "Día " + ej.diaSemana;
+                    // Si el día es 1 pone Lunes, si es 2 Martes, etc. Si pasara de 7, pone "Día X" por si acaso.
+                    const dia = nombresDeDias[ej.diaSemana] || ("Día " + ej.diaSemana);
                     if(!ejerciciosPorDia[dia]) ejerciciosPorDia[dia] = [];
                     ejerciciosPorDia[dia].push(ej);
                 });
@@ -1037,7 +1045,6 @@
         localStorage.clear(); window.location.href = '/login';
     }
 
-    // 🔥 NUEVO: FUNCIONES DE SEGURIDAD DEL PERFIL (CLIENTE) 🔥
     let modalPerfilInstancia;
 
     function abrirModalPerfilPropio() {
@@ -1065,7 +1072,6 @@
         const userGlobal = JSON.parse(usuarioDatosStr);
         const passNueva = document.getElementById('perfilNuevaPassword').value;
 
-        // Por seguridad, para no perder los datos del usuario en la BBDD, enviamos todo lo que tenemos
         const payloadActualizacion = {
             nombre: userGlobal.nombre,
             email: userGlobal.email,
@@ -1080,7 +1086,6 @@
             diasDisponibles: userGlobal.diasDisponibles || 3
         };
 
-        // Usamos el endpoint de administración pero atacando a nuestra propia ID
         fetch('/api/admin/usuarios/' + userGlobal.id, {
             method: 'PUT',
             headers: {
