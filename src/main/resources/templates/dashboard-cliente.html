@@ -70,6 +70,8 @@
         .btn-warning { background-color: #ffd166; border: none; color: #0B132B; }
         .btn-outline-primary { color: #4CC9F0; border-color: #4CC9F0; }
         .btn-outline-primary:hover { background-color: #4CC9F0; color: #0B132B; }
+        .btn-outline-info { color: #4CC9F0; border-color: #4CC9F0; }
+        .btn-outline-info:hover { background-color: #4CC9F0; color: #0B132B; }
         .btn-pdf { background-color: #ef476f; border: none; color: #ffffff; font-weight: bold; }
         .btn-pdf:hover { background-color: #ff5a7e; box-shadow: 0 4px 15px rgba(239, 71, 111, 0.4); }
 
@@ -102,6 +104,7 @@
         /* Listas y Badges */
         .list-group-item { background-color: transparent; border-color: #2A3B5C; color: #e2e8f0; }
         .badge.bg-light { background-color: #2A3B5C !important; color: #4CC9F0 !important; }
+        .badge.bg-user { background-color: rgba(76, 201, 240, 0.1); color: #4CC9F0; border: 1px solid #4CC9F0; }
 
         /* Panel Dieta - Diseño Neón Oscuro */
         .card-macro { border-radius: 15px; transition: transform 0.2s; background-color: #0B132B !important; border-width: 2px !important; }
@@ -136,7 +139,10 @@
 <nav class="navbar navbar-dark mb-4 shadow">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1" id="navNombreUsuario">⚡ Fitness App PRO</span>
-        <button class="btn btn-outline-danger btn-sm" onclick="cerrarSesion()">Cerrar Sesión</button>
+        <div>
+            <button class="btn btn-outline-info btn-sm fw-bold me-2" onclick="abrirModalPerfilPropio()"><i class="bi bi-person-circle"></i> Mi Perfil</button>
+            <button class="btn btn-outline-danger btn-sm" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
     </div>
 </nav>
 
@@ -249,6 +255,11 @@
                             </div>
                             <h6 class="fw-bold mt-2" style="color:#a0aec0;">Últimos registros:</h6>
                             <ul id="listaPesos" class="list-group list-group-flush mb-3"></ul>
+
+                            <div class="mt-3 mb-3 p-2 rounded" style="background-color: rgba(0,0,0,0.2);">
+                                <canvas id="graficaPeso" height="150"></canvas>
+                            </div>
+
                             <button class="btn btn-outline-info btn-sm w-100 mt-auto fw-bold" onclick="forzarRecalculo()">
                                 ⚙️ Reconfigurar Dieta y Objetivo
                             </button>
@@ -403,6 +414,34 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalMiPerfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content" style="border-color: #4CC9F0;">
+            <div class="modal-header bg-info text-white border-0" style="background-color: #3A86FF !important;">
+                <h5 class="modal-title fw-bold"><i class="bi bi-person-badge-fill"></i> Seguridad de Mi Perfil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="p-3 mb-4 rounded text-center" style="background-color: rgba(58, 134, 255, 0.1); border: 1px dashed #3A86FF;">
+                    <h5 class="text-white fw-bold mb-1" id="perfilNombre">Cargando...</h5>
+                    <span class="badge bg-user" id="perfilRol">CLIENTE</span>
+                </div>
+                <form id="formMiPerfil">
+                    <div class="mb-3">
+                        <label class="form-label text-white">Nueva Contraseña de Acceso</label>
+                        <input type="password" id="perfilNuevaPassword" class="form-control" placeholder="Escribe tu nueva clave (Mínimo 6 caracteres)" minlength="6" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Por seguridad, tu sesión actual se cerrará automáticamente al cambiar la clave y tendrás que volver a iniciar sesión.</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 text-white fw-bold mt-2">💾 Guardar Nueva Contraseña</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -421,7 +460,6 @@
     let historialCompleto = [];
     let semanaActiva = null;
 
-    // 🔥 ACTUALIZADO: CARGA RUTINAS CON DISEÑO DE PESTAÑAS POR DÍAS 🔥
     function cargarRutinas() {
         fetch('/api/rutinas', { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
@@ -434,10 +472,8 @@
                     return;
                 }
 
-                // Cogemos la última rutina generada
                 const ultimaRutina = data[data.length - 1];
 
-                // 1. Agrupamos los ejercicios por día
                 const ejerciciosPorDia = {};
                 ultimaRutina.ejercicios.forEach(ej => {
                     const dia = ej.nombreDia ? ej.nombreDia.replace(/Semana \d+ /gi, '').trim() : "Día " + ej.diaSemana;
@@ -445,7 +481,6 @@
                     ejerciciosPorDia[dia].push(ej);
                 });
 
-                // 2. Empezamos a construir la tarjeta principal
                 let html = `
                 <div class="card mb-5 shadow-lg">
                     <div class="card-header d-flex justify-content-between align-items-center py-3">
@@ -456,7 +491,6 @@
                         <p class="card-text text-muted mb-4 text-center fs-5">${ultimaRutina.descripcion}</p>
                 `;
 
-                // 3. CREAMOS LOS BOTONES DE LAS PESTAÑAS (TABS) PARA CADA DÍA
                 html += `<ul class="nav nav-pills justify-content-center mb-4 gap-2" id="dias-tab" role="tablist">`;
                 let esPrimerDia = true;
 
@@ -473,7 +507,6 @@
                 });
                 html += `</ul>`;
 
-                // 4. CREAMOS EL CONTENIDO DE CADA PESTAÑA (LAS TABLAS DE EJERCICIOS SEPARADAS)
                 html += `<div class="tab-content" id="dias-tabContent">`;
                 esPrimerDia = true;
 
@@ -494,7 +527,6 @@
                                     <tbody>
                     `;
 
-                    // Insertamos los ejercicios de ese día específico
                     ejerciciosPorDia[dia].forEach(ej => {
                         html += `
                             <tr>
@@ -518,7 +550,7 @@
                     esPrimerDia = false;
                 });
 
-                html += `</div></div></div>`; // Cerramos content, card-body y card
+                html += `</div></div></div>`;
                 contenedor.innerHTML = html;
             });
     }
@@ -920,23 +952,73 @@
             });
     }
 
+    let miGraficaPeso = null;
+
     function cargarHistorialPesos() {
         fetch('/api/dieta/pesos', { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(pesos => {
                 const lista = document.getElementById('listaPesos');
                 lista.innerHTML = '';
+
                 if(pesos.length === 0) {
                     lista.innerHTML = '<li class="list-group-item text-muted small px-0 border-0">Aún no hay registros de peso.</li>';
-                } else {
-                    pesos.slice(0, 5).forEach(p => {
-                        lista.innerHTML += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-bottom border-secondary small">
-                                <span class="text-white">📅 ${p.fecha}</span>
-                                <span class="badge bg-primary rounded-pill fs-6">${p.peso} kg</span>
-                            </li>`;
-                    });
+                    document.getElementById('graficaPeso').style.display = 'none';
+                    return;
                 }
+
+                document.getElementById('graficaPeso').style.display = 'block';
+
+                pesos.slice(0, 3).forEach(p => {
+                    lista.innerHTML += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-bottom border-secondary small">
+                            <span class="text-white">📅 ${p.fecha}</span>
+                            <span class="badge bg-primary rounded-pill fs-6">${p.peso} kg</span>
+                        </li>`;
+                });
+
+                const datosParaGrafica = [...pesos].reverse();
+                const etiquetas = datosParaGrafica.map(p => p.fecha);
+                const valores = datosParaGrafica.map(p => p.peso);
+
+                const ctx = document.getElementById('graficaPeso').getContext('2d');
+
+                if (miGraficaPeso) {
+                    miGraficaPeso.destroy();
+                }
+
+                miGraficaPeso = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: etiquetas,
+                        datasets: [{
+                            label: 'Evolución (kg)',
+                            data: valores,
+                            borderColor: '#06d6a0',
+                            backgroundColor: 'rgba(6, 214, 160, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#3A86FF',
+                            pointBorderColor: '#ffffff',
+                            pointRadius: 5,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                ticks: { color: '#a0aec0' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            x: {
+                                ticks: { color: '#a0aec0', maxRotation: 45, minRotation: 45 },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
             });
     }
 
@@ -954,6 +1036,70 @@
     function cerrarSesion() {
         localStorage.clear(); window.location.href = '/login';
     }
+
+    // 🔥 NUEVO: FUNCIONES DE SEGURIDAD DEL PERFIL (CLIENTE) 🔥
+    let modalPerfilInstancia;
+
+    function abrirModalPerfilPropio() {
+        if (usuarioDatosStr) {
+            const user = JSON.parse(usuarioDatosStr);
+            document.getElementById('perfilNombre').innerText = user.nombre || 'Atleta';
+            let rolName = user.rol || 'CLIENTE';
+            if (typeof user.rol === 'object') rolName = user.rol.nombre;
+            document.getElementById('perfilRol').innerText = rolName;
+        }
+
+        document.getElementById('perfilNuevaPassword').value = "";
+        const modalElement = document.getElementById('modalMiPerfil');
+
+        if (!modalPerfilInstancia) {
+            modalPerfilInstancia = new bootstrap.Modal(modalElement);
+        }
+        modalPerfilInstancia.show();
+    }
+
+    document.getElementById('formMiPerfil').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (!usuarioDatosStr) return;
+        const userGlobal = JSON.parse(usuarioDatosStr);
+        const passNueva = document.getElementById('perfilNuevaPassword').value;
+
+        // Por seguridad, para no perder los datos del usuario en la BBDD, enviamos todo lo que tenemos
+        const payloadActualizacion = {
+            nombre: userGlobal.nombre,
+            email: userGlobal.email,
+            password: passNueva,
+            rol: userGlobal.rol,
+            objetivo: userGlobal.objetivo || "Mantener",
+            nivelExperiencia: userGlobal.nivelExperiencia || "Principiante",
+            edad: userGlobal.edad || 18,
+            peso: userGlobal.peso || 70.0,
+            altura: userGlobal.altura || 1.70,
+            sexo: userGlobal.sexo || "Hombre",
+            diasDisponibles: userGlobal.diasDisponibles || 3
+        };
+
+        // Usamos el endpoint de administración pero atacando a nuestra propia ID
+        fetch('/api/admin/usuarios/' + userGlobal.id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(payloadActualizacion)
+        })
+            .then(res => {
+                if(res.ok) {
+                    modalPerfilInstancia.hide();
+                    alert("🔒 ¡Tu contraseña ha sido actualizada con éxito! Por tu seguridad, la sesión se cerrará ahora.");
+                    cerrarSesion();
+                } else {
+                    alert("Hubo un problema al actualizar la contraseña. Revisa tu conexión.");
+                }
+            })
+            .catch(err => alert("Error en el servidor: " + err));
+    });
 
     cargarRutinas();
 </script>
